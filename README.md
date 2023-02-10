@@ -13,6 +13,8 @@ make kcore
 (iv)next type ./core
 
 You must be able to see the outoput as : 
+
+
 --Network with only K-cores--
 Core 0's vertexs: 
 Core 1's vertexs: 
