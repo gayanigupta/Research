@@ -2,7 +2,8 @@
 
 #Change thos line to
 #ESSENS=<Path to Where ESSENS is Stored>/ESSENS
-ESSENS=/Users/gayanigupta/Documents/Research_Essens/ESSENS
+#ESSENS=/Users/gayanigupta/Documents/Research_Essens/ESSENS
+ESSENS=/Users/gayanigupta/Documents/GitHub/Research/graph_kcores/graph_kcores/ESSENS
 
 
 #Including BASIC_IO
@@ -68,7 +69,8 @@ test1: 	test_SetOps.cpp
 	g++ $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) test_SetOps.cpp
 anonymize: TestMain.cpp
 	g++ $(BASIC_IO_INC) TestMain.cpp -o TestMain
-
+core: test_kcores.cpp
+	g++ $(BASIC_IO_INC) test_kcores.cpp -o test_kcores
 
 
 

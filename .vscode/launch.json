@@ -1,0 +1,32 @@
+/* launch.json */
+{
+    "version": "2.0.0",
+    "configurations": [
+        
+        {
+            "name": "C++ Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            /*"program": "${workspaceRoot}/${fileBasenameNoExtension}.exe",*/
+            "program": "${workspaceRoot}/${fileBasenameNoExtension}",
+            /*"preLaunchTask": "build",*/
+            "preLaunchTask": "g++ build active file",
+            "internalConsoleOptions": "openOnSessionStart",
+            "logging": {
+                "moduleLoad": false,
+                "programOutput": true,
+                "trace": false
+            },
+            "console": "integratedTerminal",
+            "showDisplayString": false,
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}",
+            "environment": [],
+            "externalConsole": true, // set true to enable keyboard input
+            "osx": {
+                "MIMode": "lldb"
+            }
+        }
+    ]
+}
