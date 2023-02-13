@@ -22,7 +22,7 @@ void print_network(A_Network& x, const char* network_name)
 	{
 		ADJ_Bundle& adj = x[i];
 
-		cout << "Node " << i << "'s vertexs: ";
+		cout << "Core " << i << "'s vertexs: ";
 		for (int j = 0; j < adj.ListW.size(); ++j)
 		{
 			cout << adj.ListW.at(j).first;
