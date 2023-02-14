@@ -3,7 +3,7 @@
 #Change thos line to
 #ESSENS=<Path to Where ESSENS is Stored>/ESSENS
 #ESSENS=/Users/gayanigupta/Documents/Research_Essens/ESSENS
-ESSENS=/Users/gayanigupta/Documents/GitHub/Research/graph_decomposition/ESSENS
+ESSENS=/Users/gayanigupta/Documents/GitHub/Research/graph_kcores/graph_kcores/ESSENS
 
 #Including BASIC_IO
 BASIC_IO= $(ESSENS)/Core/Basic_IO
@@ -68,11 +68,9 @@ test1: 	test_SetOps.cpp
 	g++ $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) test_SetOps.cpp
 anonymize: TestMain.cpp
 	g++ $(BASIC_IO_INC) TestMain.cpp -o TestMain
-kcore: 	test_kcores.cpp      
-	g++ -g -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) test_kcores.cpp -o core
-elimination: eliminationorder.cpp      
-	g++ -g -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) eliminationorder.cpp -o elimination
-elimination_u: eliminationorder_updated.cpp      
-	g++ -g -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) eliminationorder_updated.cpp -o _u
+kcore: 	test_kcores_read_text.cpp      
+	g++ -g -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) test_kcores_read_text.cpp -o core
+
+
 
 
