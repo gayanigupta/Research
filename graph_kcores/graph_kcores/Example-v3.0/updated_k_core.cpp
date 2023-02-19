@@ -1,39 +1,54 @@
 // C++ program to find K-Cores of a graph
 #include <iostream>
-#include<list>
+#include <list>
 
-//INPUT HEADERS
+// INPUT HEADERS
 #include "input_to_network.hpp"
-#include"structure_defs.hpp"
+#include "structure_defs.hpp"
 
-void print_network(A_Network& x, const char* network_name)
+void print_network(A_Network &x, const char *network_name)
 {
 	cout << "--" << network_name << "--" << endl;
 	for (int i = 0; i < x.size(); ++i)
 	{
-		ADJ_Bundle& adj = x[i];
+		ADJ_Bundle &adj = x[i];
 
-		if (adj.ListW.size()>0)
+		if (adj.ListW.size() > 0)
 		{
-		cout <<"  Core  : "<<adj.ListW.size()<<" - Vertex " << i << "'s - Linked vertices : ";
-		for (int j = 0; j < adj.ListW.size(); ++j)
-		{
-			cout << adj.ListW.at(j).first;
-			if (j < adj.ListW.size() - 1)
-				cout << ", ";
-		}
+			cout << "  Degree  : " << adj.ListW.size() << " - Vertex " << i << "'s - Linked vertices : ";
+			for (int j = 0; j < adj.ListW.size(); ++j)
+			{
+				cout << adj.ListW.at(j).first;
+				if (j < adj.ListW.size() - 1)
+					cout << ", ";
+			}
 		}
 		cout << endl;
 	}
 	cout << endl;
 }
 
-int get_max_no_of_network(A_Network& x)
+void print_vertex_core_no(A_Network &x)
+{
+	cout << "--- print vertices and the core number -- "<< endl;
+	for (int i = 0; i < x.size(); ++i)
+	{
+		ADJ_Bundle &adj = x[i];
+
+		if (adj.ListW.size() > 0)
+		{
+			cout << " vertex #: " << x[i].Row << "  core #  : " << adj.ListW.size() << endl;
+			
+		}
+	}
+
+}
+int get_max_no_of_network(A_Network &x)
 {
 	int max_no = -1;
 	for (int i = 0; i < x.size(); ++i)
 	{
-		vector <int_double>& listW = x[i].ListW;
+		vector<int_double> &listW = x[i].ListW;
 		for (int j = 0; j < listW.size(); ++j)
 		{
 			if (listW[j].first > max_no)
@@ -43,9 +58,9 @@ int get_max_no_of_network(A_Network& x)
 	return max_no;
 }
 
-bool checkEdge(ADJ_Bundle& bundle, int vertex_no)
+bool checkEdge(ADJ_Bundle &bundle, int vertex_no)
 {
-	vector<int_double>& adj = bundle.ListW;
+	vector<int_double> &adj = bundle.ListW;
 	for (int i = 0; i < adj.size(); ++i)
 	{
 		if (adj[i].first == vertex_no)
@@ -55,10 +70,10 @@ bool checkEdge(ADJ_Bundle& bundle, int vertex_no)
 	return false;
 }
 
-bool addUndirectedEdge(ADJ_Bundle& bundle, int vertex_no)
+bool addUndirectedEdge(ADJ_Bundle &bundle, int vertex_no)
 {
 	bool found = false;
-	vector<int_double>& adj = bundle.ListW;
+	vector<int_double> &adj = bundle.ListW;
 	vector<int_double>::iterator it = adj.begin();
 	for (; it != adj.end(); ++it)
 	{
@@ -80,12 +95,12 @@ bool addUndirectedEdge(ADJ_Bundle& bundle, int vertex_no)
 	return false;
 }
 
-bool removeDirectedEdge(A_Network& x, int start_no, int end_no)
+bool removeDirectedEdge(A_Network &x, int start_no, int end_no)
 {
 	if (start_no > x.size() - 1)
 		return false;
 
-	vector<int_double>& listW = x[start_no].ListW;
+	vector<int_double> &listW = x[start_no].ListW;
 	vector<int_double>::iterator it = listW.begin();
 	for (; it != listW.end(); ++it)
 	{
@@ -98,12 +113,12 @@ bool removeDirectedEdge(A_Network& x, int start_no, int end_no)
 	return false;
 }
 
-bool removeUndirectedEdge(A_Network& x, int start_no, int end_no)
+bool removeUndirectedEdge(A_Network &x, int start_no, int end_no)
 {
 	return removeDirectedEdge(x, start_no, end_no) && removeDirectedEdge(x, end_no, start_no);
 }
 
-void convertDirected2UndirectedNetwork(A_Network& a, A_Network& b)
+void convertDirected2UndirectedNetwork(A_Network &a, A_Network &b)
 {
 	int count = get_max_no_of_network(a) + 1;
 	int i = 0;
@@ -119,16 +134,15 @@ void convertDirected2UndirectedNetwork(A_Network& a, A_Network& b)
 
 	for (i = 0; i < a.size(); ++i)
 	{
-		vector<int_double>& adj = a[i].ListW;
+		vector<int_double> &adj = a[i].ListW;
 		for (int j = 0; j < adj.size(); ++j)
 			addUndirectedEdge(b[adj[j].first], i);
 	}
-
 }
 
-void print_network_kcores(A_Network& x, int count, int k, const char* network_name)
+void print_network_kcores(A_Network &x, int count, int k)//, const char *network_name)
 {
-	cout << "--" << network_name << "' kcore group--" << endl;
+	//cout << "--" << network_name << "' kcore group--" << endl;
 
 	vector<vector<int> > groups;
 	for (int i = 0; i < count; ++i)
@@ -157,19 +171,19 @@ void print_network_kcores(A_Network& x, int count, int k, const char* network_na
 	cout << endl;
 }
 
-void convert2NetworkWithKCoresEx(A_Network& src, A_Network& x, int k)
+void convert2NetworkWithKCoresEx(A_Network &src, A_Network &x, int k)
 {
 	convertDirected2UndirectedNetwork(src, x);
 
 	int count = x.size();
-	
+
 	cout << endl;
 	// Store degrees of all vertices
 	vector<int> degrees(count, 0);
 	for (int i = 0; i < count; i++)
 	{
 		degrees[i] = x[i].ListW.size();
-		cout << "Vertex " << i << "'s degree: " << degrees[i] << endl;
+		//cout << "Vertex " << i << "'s degree: " << degrees[i] << endl;
 	}
 
 	vector<bool> processed(count, false);
@@ -180,10 +194,10 @@ void convert2NetworkWithKCoresEx(A_Network& src, A_Network& x, int k)
 		{
 			if (processed[i])
 				continue;
-			
+
 			if (degrees[i] < k)
-			{// Remove the vertex
-				vector<int_double>& listW = x[i].ListW;
+			{ // Remove the vertex
+				vector<int_double> &listW = x[i].ListW;
 				for (int j = 0; j < listW.size(); ++j)
 				{
 					int end_vertex = listW[j].first;
@@ -195,7 +209,7 @@ void convert2NetworkWithKCoresEx(A_Network& src, A_Network& x, int k)
 
 				listW.clear();
 				degrees[i] = 0;
-				
+
 				processed[i] = true;
 				removed_count++;
 			}
@@ -206,10 +220,21 @@ void convert2NetworkWithKCoresEx(A_Network& src, A_Network& x, int k)
 	}
 
 	cout << endl;
-	for (int i = 0; i < count; i++)
-		cout << "Vertex " << i << "'s degree: " << degrees[i] << endl;
+	/*for (int i = 0; i < count; i++)
+		cout << "Vertex " << i << "'s degree: " << degrees[i] << endl;*/
 }
+void print_all_kores(A_Network &src, A_Network &x, int startCore, int endCore)
+{
+	int count = get_max_no_of_network(src) + 1;
+	for (int i = startCore; i < endCore; i++)
+	{
+		convert2NetworkWithKCoresEx(src, x, i);
 
+		// print_network(x, "Network with only K-cores"); - uncomment to print the graph per core
+		print_network_kcores(x, count, i);
+		print_vertex_core_no(x);
+	}
+}
 // Driver program to test methods of graph class
 int main()
 {
@@ -227,7 +252,6 @@ int main()
 	}
 
 	fin.close();
-
 	A_Network x1;
 	create_Network(&edges, 0, &x1, -1);
 
@@ -236,14 +260,16 @@ int main()
 	int count = get_max_no_of_network(x1) + 1;
 
 	A_Network kcores;
-	convert2NetworkWithKCoresEx(x1, kcores, 3);
+	convert2NetworkWithKCoresEx(x1, kcores, 2);
 
 	print_network(kcores, "Network with only K-cores");
-	
-	//print_network_kcores(kcores, count, 3, "Network with only K-cores");
 
-	cout << endl << endl;
+	print_network_kcores(kcores, count, 2);
+
+	//print_all_kores(x1, kcores, 0, 4);
+
+	cout << endl
+		 << endl;
 
 	return 0;
 }
-

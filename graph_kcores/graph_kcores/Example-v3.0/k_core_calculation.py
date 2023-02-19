@@ -12,8 +12,6 @@ G.add_edges_from([(0,1),(0,2),
                   (7,4),(7,3),(7,6),
                   (8,5),(8,6)
                 ])
-nx.draw(G, with_labels=True, pos=nx.spring_layout(G))
-plt.show()
 #print(G.nodes())
 #print(G.edges())
 #print(nx.k_core(G,k=3).edges())
