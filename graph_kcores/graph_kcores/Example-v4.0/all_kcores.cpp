@@ -300,7 +300,7 @@ int main()
 
 	// read edges from file.
 	fstream fin;
-	fin.open("Tests/test.txt", ios::in);
+	fin.open("Tests/core_1.txt", ios::in);
 	if (fin.is_open() == false)
 		return 0;
 
