@@ -29,7 +29,7 @@ void create_Network(vector<Edge>* b, int bf_size, A_Network* X, int Ns)
 		int node2 = b->at(i).node2;
 		double edge_wt = b->at(i).edge_wt;
 
-		// printf("%d %d \n", node1, node2);
+		 printf("%d %d \n", node1, node2);
 		//Initailize and Add Row
 		if (current_node != node1)
 		{

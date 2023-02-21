@@ -6,6 +6,7 @@
 //INPUT HEADERS
 #include "input_to_network.hpp"
 #include"structure_defs.hpp"
+#include "translate_from_input.hpp"
 
 void heapify(vector<int>& arr, int n, int i)
 {
@@ -294,15 +295,18 @@ void calculateGraphCore(A_Network& src, A_Network& x, int k, vector<int>& remove
 }
 
 // Driver program to test methods of graph class
-int main()
+int main(int argc, char *argv[])
 {
+	clock_t q, q1, q2,t;
 	vector<Edge> edges;
 
 	// read edges from file.
-	fstream fin;
-	fin.open("Tests/core_1.txt", ios::in);
+	/*fstream fin;
+	fin.open("Tests/core_2.txt", ios::in);
 	if (fin.is_open() == false)
-		return 0;
+		{return 0;}
+
+		cout << "read file went through "<<endl;
 
 	while (!fin.eof())
 	{
@@ -312,12 +316,52 @@ int main()
 	}
 
 	fin.close();
+	cout << "read file "<<endl; */
 
-	
+	/*
 
 	// Create a network with edges.
 	A_Network x1;
 	create_Network(&edges, 0, &x1, -1);
+    cout << "**** \n";
+	*/
+
+// Preprocess Nodes to Numbers
+        //Stores file in argv[3]: store map in argv[4]
+        //Vertices start from 0
+	q=clock();
+    //Check if valid input is given
+    if ( argc < 3) { cout << "INPUT ERROR:: At least 2 inputs required. First: filename \n Second: Filetypes: 1:node_node_wt 2:node_wt_node 3:node_node 4:node_node (Only option 1 is active now) \n Third. Name of new file \n Fourth. Name of Map file\n"; return 0;}
+    //Check to see if file opening succeeded
+    ifstream the_file ( argv[1] ); if (!the_file.is_open() ) { cout<<"INPUT ERROR:: Could not open file\n";}
+    
+   	 A_Network x1;
+    int nodes=-1;
+    map_int_st revmap;
+        int type=atoi("1");
+        translate_input(argv[1],type,argv[3],argv[4]);
+        
+        //Remove Duplicate Edges and Self Loops; Create Undirected Graphs
+        // process_to_simple_undirected();
+        q=clock()-q;
+        cout << "Total Time for Preprocessing"<< ((float)q)/CLOCKS_PER_SEC <<"\n";
+        
+        /***** Preprocessing to Graph (GUI) ***********/
+        
+        
+        /******* Read Graph (GUI) and Create Reverse Map*****************/
+        //Obtain the list of edges.
+        q=clock();
+        readin_network(&x1,argv[3],nodes);
+        
+        //Create Reversemap
+        
+        nodes=x1.size();
+        create_map(argv[4],&revmap);
+        
+        q=clock()-q;
+        cout << "Total Time for Reading Network"<< ((float)q)/CLOCKS_PER_SEC <<"\n";
+        /**** Read Graph (GUI) ***********/
 	//Print original network
 	//print_network(x1, "Original Network");
 
