@@ -1,0 +1,25 @@
+Graph Elimination Ordering
+Let’s denote  variables as.
+	X: input graph(used used A_Network structure)
+	XU: undirected graph generated from X
+ol: ordering list to remove vertices
+ 	trees: array for each vertex’s tree
+	d: degree array of vertices of XU
+p: array to mark whether vertices of XU are processed.
+kp: array to contain maximum kcore value of every vertex.
+sel: vertex to be processed
+	•	Create X from a file with edge pairs.
+	•	Convert X to XU
+	•	Initialize all elements of d as 0, all elements of p as false
+	•	Calculate the degree of every vertex of XU
+	•	Find the vertex sel with the smallest degree in XU.
+	•	Add sel to the ordering list ol.
+	•	Add the vertices connected with s to s’ tree list trees[sel]
+	•	Remove all the edges to be input to sel and to be output from sel.
+At same time, decrease degrees of vertices to the removed edge as -1
+	•	Set sel’s mark p[sel] as true.
+	•	If all the vertices of XU are processed, go to next else go to e) 
+	•	Output ol and trees.
+	•	Finish algorithm.
+	
+

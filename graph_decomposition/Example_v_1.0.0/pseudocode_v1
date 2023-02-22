@@ -1,0 +1,9 @@
+1. Take graph
+2. Store the graph in adjacency list
+3. store the graph as node using the following steps
+  - start from zero node
+  - Find all the neighbors of the selected node
+  - Create a tree node that's the node and all the neighbors ( A tree node is a struct with more than one vertex)
+4. Select the next node from the graph and continue step 3
+- Connect the tree nodes together by finding a common vertex
+- In order to select the next node always select from the current node list you had take
