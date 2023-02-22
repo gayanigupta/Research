@@ -73,6 +73,6 @@ kcore: 	test_kcores.cpp
 elimination: eliminationorder.cpp      
 	g++ -g -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) eliminationorder.cpp -o elimination
 elimination_u: eliminationorder_updated.cpp      
-	g++ -g -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) eliminationorder_updated.cpp -o _u
+	g++ -g -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) eliminationorder_updated.cpp -o elim
 
 
