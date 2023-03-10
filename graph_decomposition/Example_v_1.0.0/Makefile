@@ -75,4 +75,5 @@ elimination: eliminationorder.cpp
 elimination_u: eliminationorder_updated.cpp      
 	g++ -g -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) eliminationorder_updated.cpp -o elim
 
-
+testpaths: testpaths.cpp      
+	g++ -g -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) testpaths.cpp -o testpaths
