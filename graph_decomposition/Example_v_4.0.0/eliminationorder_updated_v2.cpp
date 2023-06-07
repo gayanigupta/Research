@@ -81,6 +81,7 @@ std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationO
     std::vector<bool> processed(numVertices, false);
     std::vector<bool> Q1Array(numVertices, false);
 
+    // Step 1: Initialize LP, C, processed, and Q1Array based on input edges
     for (const Edge& edge : edges)
     {
         int v = edge.node2;
@@ -90,7 +91,7 @@ std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationO
         if (wt != 0 && LP[v] == -1)
         {
             LP[v] = w;
-            processed[v] = true;
+            processed[v] = false;  // Make all vertices initially unprocessed
 
             if (!Q1Array[w])
             {
@@ -100,9 +101,57 @@ std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationO
         }
     }
 
-    while (true)
+    // Step 2: Find nodes without parents (nodes not present in LP)
+    std::vector<int> nodesWithoutParents;
+    for (int v = 0; v < numVertices; ++v)
     {
-        bool allProcessed = true;
+        if (LP[v] == -1)
+        {
+            nodesWithoutParents.push_back(v);
+        }
+    }
+
+    // Step 3: Eliminate chordal nodes by adding them to the elimination order
+    for (int v : nodesWithoutParents)
+    {
+        eliminationOrder.push_back(v);
+
+        // Mark the node as processed
+        processed[v] = true;
+
+        // Check if the node has children and update their chordal sets
+        for (const Edge& edge : edges)
+        {
+            int w = edge.node2;
+            int u = edge.node1;
+            double wt = edge.edge_wt;
+
+            if (LP[w] == v && std::includes(C[v].begin(), C[v].end(), C[w].begin(), C[w].end()) && !processed[w])
+            {
+                C[v].insert(w);  // Insert to child's chordal set
+                Edge chordalEdge = {v, w, wt};  // Edge should be v -> w
+                chordalEdges.push_back(chordalEdge);
+                Q1Array[w] = true;
+                processed[w] = true;  // Set w as processed
+
+                // Print additional information
+                std::cout << "Found chordal edge: " << chordalEdge.node1 << " - " << chordalEdge.node2 << std::endl;
+                std::cout << "Updated C[" << v << "]: ";
+                for (int node : C[v])
+                {
+                    std::cout << node << " ";
+                }
+                std::cout << std::endl;
+            }
+        }
+    }
+
+    bool allProcessed = false;
+
+    // Step 4: Iterate until all vertices are processed
+    while (!allProcessed)
+    {
+        allProcessed = true;
 
         for (int v = 0; v < numVertices; ++v)
         {
@@ -110,21 +159,23 @@ std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationO
             {
                 allProcessed = false;
 
+                // Step 5: Check edges for chordal properties
                 for (const Edge& edge : edges)
                 {
                     int w = edge.node2;
                     int u = edge.node1;
                     double wt = edge.edge_wt;
 
-                    if (LP[w] == v && isSubset(C[v], C[w]) && !processed[w])
+                    if (LP[w] == v && std::includes(C[v].begin(), C[v].end(), C[w].begin(), C[w].end()) && !processed[w])
                     {
-                        C[v].insert(w);
-                        chordalEdges.push_back(edge);
+                        C[v].insert(w);  // Insert to child's chordal set
+                        Edge chordalEdge = {v, w, wt};  // Edge should be v -> w
+                        chordalEdges.push_back(chordalEdge);
                         Q1Array[w] = true;
-                        processed[w] = true;
+                        processed[v] = true;  // Set v as processed, not w
 
                         // Print additional information
-                        std::cout << "Found chordal edge: " << edge.node1 << " - " << edge.node2 << std::endl;
+                        std::cout << "Found chordal edge: " << chordalEdge.node1 << " - " << chordalEdge.node2 << std::endl;
                         std::cout << "Updated C[" << v << "]: ";
                         for (int node : C[v])
                         {
@@ -137,14 +188,9 @@ std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationO
                 Q1Array[v] = false;
             }
         }
-
-        if (allProcessed)
-        {
-            break;
-        }
     }
 
-    // Print variable contents
+    // Print variable contents for debugging purposes
     std::cout << "LP: ";
     for (int value : LP)
     {
@@ -177,16 +223,12 @@ std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationO
     }
     std::cout << std::endl;
 
-    for (int v = 0; v < numVertices; ++v)
-    {
-        if (LP[v] == -1)
-        {
-            eliminationOrder.push_back(v);
-        }
-    }
-
+    // Return the chordal edges and elimination order
     return std::make_pair(chordalEdges, eliminationOrder);
 }
+
+
+
 /**
  *   The main driver program to test the methods of the graph class.
    - Parameters: `argc` and `argv` are command-line arguments.
