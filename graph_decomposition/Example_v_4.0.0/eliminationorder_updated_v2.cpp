@@ -111,12 +111,10 @@ std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationO
         }
     }
 
-    // Step 3: Eliminate chordal nodes by adding them to the elimination order
+    // Step 3: Process nodes without parents and eliminate chordal nodes
     for (int v : nodesWithoutParents)
     {
         eliminationOrder.push_back(v);
-
-        // Mark the node as processed
         processed[v] = true;
 
         // Check if the node has children and update their chordal sets
@@ -172,7 +170,8 @@ std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationO
                         Edge chordalEdge = {v, w, wt};  // Edge should be v -> w
                         chordalEdges.push_back(chordalEdge);
                         Q1Array[w] = true;
-                        processed[v] = true;  // Set v as processed, not w
+                        processed[v] = true; 
+                        processed[w] = true;  // Set w as processed
 
                         // Print additional information
                         std::cout << "Found chordal edge: " << chordalEdge.node1 << " - " << chordalEdge.node2 << std::endl;
@@ -226,7 +225,6 @@ std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationO
     // Return the chordal edges and elimination order
     return std::make_pair(chordalEdges, eliminationOrder);
 }
-
 
 
 /**
