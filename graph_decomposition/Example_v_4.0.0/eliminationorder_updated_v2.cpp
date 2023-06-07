@@ -12,6 +12,9 @@
 #include "printout_others.hpp"
 
 using namespace std;
+
+bool isSubset(const std::set<int>& set1, const std::set<int>& set2);
+std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationOrder(const std::vector<Edge>& edges, int numVertices);
 /**
  * - Description: Checks if one set is a subset of another set.
    - Parameters: `set1` and `set2` are the sets to be compared.
@@ -49,7 +52,21 @@ bool isSubset(const std::set<int>& set1, const std::set<int>& set2)
 
 
 /**
- * 
+ *    - Description: Finds the chordal edges and elimination order of a graph.
+   - Parameters:
+     - `edges`: A vector of edges in the graph.
+     - `numVertices`: The number of vertices in the graph.
+   - Return Type: `std::pair<std::vector<Edge>, std::vector<int>>`
+   - Returns: A pair containing the chordal edges and elimination order.
+   - Steps:
+     1. Initialize variables for chordal edges (`chordalEdges`), elimination order (`eliminationOrder`), lowest parent (`LP`), sets (`C`), processed vertices (`processed`), and Q1 array (`Q1Array`).
+     2. Find the lowest parent (`LP`) and populate the Q1 array.
+     3. Process the vertices until the Q1 array is empty:
+        - For each vertex in the Q1 array, check its neighbors and update the sets (`C`), chordal edges (`chordalEdges`), and processed vertices (`processed`) accordingly.
+     4. Find the nodes without parents and eliminate chordal nodes first by adding them to the elimination order.
+     5. Add the remaining non-chordal nodes to the elimination order.
+     6. Return the pair containing the chordal edges and elimination order.
+
 */
 
 
@@ -170,7 +187,22 @@ std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationO
 
     return std::make_pair(chordalEdges, eliminationOrder);
 }
+/**
+ *   The main driver program to test the methods of the graph class.
+   - Parameters: `argc` and `argv` are command-line arguments.
+   - Return Type: `int`
+   - Returns: Exit status of the program.
+   - Steps:
+     1. Perform input validation and check if valid input is given.
+     2. Open the input file and check if it was successfully opened.
+     3. Initialize variables for clock times (`q`, `q1`, `q2`, `t`), vector of edges (`edges`), network (`x1`), number of nodes (`nodes`), reverse map (`revmap`), and type of file (`type`).
+     4. Perform preprocessing steps, including file translation and creating a reverse map.
+     5. Read the network from the translated file and create the reverse map.
+     6. Find the chordal edges with elimination order using the `findChordalEdgesWithEliminationOrder` method.
+     7. Output the chordal edges and elimination order to the console.
+     8. Return the exit status of the program.
 
+*/
 int main(int argc, char* argv[])
 {
     clock_t q, q1, q2, t;
