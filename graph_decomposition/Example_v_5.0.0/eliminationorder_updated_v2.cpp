@@ -81,16 +81,31 @@ bool isSubset(const std::set<int> &set1, const std::set<int> &set2)
 }
 
 /**
- *
- */
+ *    - Description: Finds the chordal edges and elimination order of a graph.
+   - Parameters:
+     - `edges`: A vector of edges in the graph.
+     - `numVertices`: The number of vertices in the graph.
+   - Return Type: `std::pair<std::vector<Edge>, std::vector<int>>`
+   - Returns: A pair containing the chordal edges and elimination order.
+   - Steps:
+     1. Initialize variables for chordal edges (`chordalEdges`), elimination order (`eliminationOrder`), lowest parent (`LP`), sets (`C`), processed vertices (`processed`), and Q1 array (`Q1Array`).
+     2. Find the lowest parent (`LP`) and populate the Q1 array.
+     3. Process the vertices until the Q1 array is empty:
+        - For each vertex in the Q1 array, check its neighbors and update the sets (`C`), chordal edges (`chordalEdges`), and processed vertices (`processed`) accordingly.
+     4. Find the nodes without parents and eliminate chordal nodes first by adding them to the elimination order.
+     5. Add the remaining non-chordal nodes to the elimination order.
+     6. Return the pair containing the chordal edges and elimination order.
 
-std::pair<std::vector<Edge>, std::vector<int>> findChordalEdgesWithEliminationOrder(const std::vector<Edge> &edges, int numVertices)
+*/
+
+
+std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationOrder(const std::vector<Edge> &edges, int numVertices)
 {
     std::vector<Edge> chordalEdges;
     std::vector<int> eliminationOrder;
 
     std::vector<int> LP(numVertices, -1);
-    std::vector<std::set<int>> C(numVertices, std::set<int>());
+    std::vector<std::set<int> > C(numVertices, std::set<int>());
 
     std::vector<bool> processed(numVertices, false);
     std::vector<bool> Q1Array(numVertices, false);
@@ -260,7 +275,7 @@ int main(int argc, char *argv[])
 
     // print(edges);
 
-    std::pair<std::vector<Edge>, std::vector<int>> result = findChordalEdgesWithEliminationOrder(edges, nodes);
+    std::pair<std::vector<Edge>, std::vector<int> > result = findChordalEdgesWithEliminationOrder(edges, nodes);
     std::vector<Edge> chordalEdges = result.first;
     std::vector<int> eliminationOrder = result.second;
 
