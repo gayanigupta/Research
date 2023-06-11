@@ -2,11 +2,13 @@
 #include <iostream>
 #include<list>
 #include <algorithm>
-
+#include <set>
 //INPUT HEADERS
 #include "input_to_network.hpp"
 #include"structure_defs.hpp"
 #include "translate_from_input.hpp"
+
+int vertex_N;
 
 void heapify(vector<int>& arr, int n, int i)
 {
@@ -294,68 +296,36 @@ void calculateGraphCore(A_Network& src, A_Network& x, int k, vector<int>& remove
     }
 }
 
-void swapNonAdjacentNodes(A_Network& x, int a, int b) {
-    int n = x.size();
-    if (a >= n || b >= n) {
-        cout << "Invalid node index!" << endl;
+void swapNonAdjacentNodes(A_Network& x, int node1, int node2)
+{
+    // Check if node1 and node2 are valid vertices
+    if (node1 >= x.size() || node2 >= x.size()) {
+        cout << "Invalid vertices!" << endl;
         return;
     }
 
-    // Check if the nodes are adjacent
-    bool adjacent = false;
-    for (int i = 0; i < x[a].ListW.size(); ++i) {
-        if (x[a].ListW[i].first == b) {
-            adjacent = true;
-            break;
-        }
-    }
-
-    if (adjacent) {
-        cout << "Nodes are adjacent. Cannot swap." << endl;
+    // Check if node1 and node2 are non-adjacent
+    if (checkEdge(x[node1], node2) || checkEdge(x[node2], node1)) {
+        cout << "The nodes are already adjacent!" << endl;
         return;
     }
 
-    // Swap the nodes in the adjacency list
-    for (int i = 0; i < x.size(); ++i) {
-        if (i == a || i == b) {
-            continue;
-        }
+    // Remove all edges of node1
+    removeVertex(x, node1);
 
-        // Find the position of node a and b in the adjacency list of vertex i
-        int posA = -1, posB = -1;
-        for (int j = 0; j < x[i].ListW.size(); ++j) {
-            if (x[i].ListW[j].first == a) {
-                posA = j;
-            } else if (x[i].ListW[j].first == b) {
-                posB = j;
-            }
+    // Remove all edges of node2
+    removeVertex(x, node2);
 
-            if (posA != -1 && posB != -1) {
-                break;
-            }
-        }
-
-        // Swap the nodes in the adjacency list of vertex i
-        if (posA != -1) {
-            x[i].ListW[posA].first = b;
-        }
-        if (posB != -1) {
-            x[i].ListW[posB].first = a;
-        }
-    }
-
-    // Swap the nodes in the main adjacency list
-    swap(x[a].Row, x[b].Row);
-    swap(x[a].ListW, x[b].ListW);
+    // Add an undirected edge between node1 and node2
+    addUndirectedEdge(x[node1], node2);
 }
-
-
 
 vector<int> getDegreeDistribution(const A_Network& network) {
     
     vector<int> degreeDistribution(network.size(), 0);
     for (const auto& node : network) {
         int degree = node.ListW.size();
+        //cout<<degree<<endl;
         degreeDistribution[degree]++;
     }
     return degreeDistribution;
@@ -364,62 +334,185 @@ vector<int> getDegreeDistribution(const A_Network& network) {
 void printDegreeDistribution(const vector<int>& degreeDistribution) {
     cout << "Degree Distribution:\n";
     for (int i = 0; i < degreeDistribution.size(); ++i) {
+        if(degreeDistribution[i] !=0){
         cout << i << "-th degree: " << degreeDistribution[i] << endl;
+    }
     }
 }
 
+vector<int_int> Vedges;
+vector<int_int> VedgesBefore;
+vector<int_int> degree;
+vector<int_int> degreeBefore;
+
+void network_swap(A_Network& x) {
+
+    for (int i = 0; i < x.size(); ++i)
+    {
+        ADJ_Bundle& adj = x[i];
+
+        for (int j = 0; j < adj.ListW.size(); ++j)
+        {
+            Vedges.push_back(int_int(i, adj.ListW.at(j).first));
+        }
+    }
+    for (int i = 0; i < x.size(); ++i)
+    {
+        ADJ_Bundle& adj = x[i];
+
+        for (int j = 0; j < adj.ListW.size(); ++j)
+        {
+            VedgesBefore.push_back(int_int(i, adj.ListW.at(j).first));
+        }
+    }
+
+    int preBefore = -1;
+    int degBefore = 0;
+
+    int degree[1000];
+    vector<int> V[1000];
+    set<int_int> S;
+    memset(degree, 0, sizeof(degree));
+
+    for (int i = 0; i < VedgesBefore.size(); i++)
+    {
+        int first = VedgesBefore[i].first;
+        int second = VedgesBefore[i].second;
+        degree[first]++; V[first].push_back(second);
+        degree[second]++; V[second].push_back(first);
+        S.insert(int_int(first, second));
+        S.insert(int_int(second, first));
+    }
+    vector<int_int> nonadj;
+    int root = 0;
+    for (int i = 0; i < vertex_N; i++)
+        if (degree[i]) for (int j = i + 1; j < vertex_N; j++) if (degree[j]) {
+            if (!root) root = i;
+            if (S.count(int_int(i, j))) continue;
+            nonadj.push_back(int_int(i, j));
+        }
 
 
+    queue<int> Q;
+    vector<int_int> rlt;
+    Q.push(root);
+    bool vis[1000];
+    memset(vis, 0, sizeof(vis));
+    vis[root] = 1;
+    int tmp;
+    while (!Q.empty()) {
+        tmp = Q.front(); Q.pop();
+        for (int i = 0; i < V[tmp].size(); i++) if (!vis[V[tmp][i]]) {
+            Q.push(V[tmp][i]);
+            rlt.push_back(int_int(tmp, V[tmp][i]));
+            vis[V[tmp][i]] = 1;
+        }
+    }
+    for (int i = 0; i < vertex_N; i++) degree[i] = 0;
 
-int main(int argc, char* argv[]) {
-    clock_t q, q1, q2, t;
+    cout << endl;
+    cout << "--Final Result--" << endl;
+    for (int i = 0; i < rlt.size();) {
+        int node = rlt[i].first;
+        cout << "Node" << node << "'s vertexs: ";
+        while (rlt[i].first == node) {
+            degree[rlt[i].first]++;
+            degree[rlt[i].second]++;
+            cout << rlt[i].second << " ";
+            i++;
+            if (i == rlt.size()) break;
+        }
+        cout << endl;
+    }
+
+    cout << endl;
+    cout << "--Degree Distribution After Swap--" << endl;
+
+    for (int i = 0; i < vertex_N; i++)if (degree[i]) {
+        cout << "Node " << i << " has " << degree[i] << " vertexs " << endl;
+    }
+
+}
+
+// Driver program to test methods of graph class
+int main(int argc, char *argv[]) {
+
+clock_t q, q1, q2,t;
     vector<Edge> edges;
-    q = clock();
 
-    // Check if valid input is given
-    if (argc < 3) {
-        cout << "INPUT ERROR: At least 2 inputs required. First: filename \n Second: Filetypes: 1:node_node_wt 2:node_wt_node 3:node_node 4:node_node (Only option 1 is active now) \n Third. Name of new file \n Fourth. Name of Map file\n";
-        return 0;
+    // read edges from file.
+    /*fstream fin;
+    fin.open("Tests/core_2.txt", ios::in);
+    if (fin.is_open() == false)
+        {return 0;}
+
+        cout << "read file went through "<<endl;
+
+    while (!fin.eof())
+    {
+        int start_no, end_no, weight;
+        fin >> start_no >> end_no >> weight;
+        edges.push_back(create(start_no, end_no, 1));
     }
 
-    // Check to see if file opening succeeded
-    ifstream the_file(argv[1]);
-    if (!the_file.is_open()) {
-        cout << "INPUT ERROR: Could not open file\n";
-        return 0;
-    }
+    fin.close();
+    cout << "read file "<<endl; */
 
+    /*
+
+    // Create a network with edges.
     A_Network x1;
-    int nodes = -1;
+    create_Network(&edges, 0, &x1, -1);
+    cout << "**** \n";
+    */
+
+// Preprocess Nodes to Numbers
+        //Stores file in argv[3]: store map in argv[4]
+        //Vertices start from 0
+    q=clock();
+    //Check if valid input is given
+    if ( argc < 2) { cout << "INPUT ERROR:: At least 2 inputs required. First: filename \n Second: Filetypes: 1:node_node_wt 2:node_wt_node 3:node_node 4:node_node (Only option 1 is active now) \n Third. Name of new file \n Fourth. Name of Map file\n"; return 0;}
+    //Check to see if file opening succeeded
+    ifstream the_file ( argv[1] ); if (!the_file.is_open() ) { cout<<"INPUT ERROR:: Could not open file\n";}
+    
+     A_Network x1,x2;
+    int nodes=-1;
     map_int_st revmap;
-    int type = atoi("1");
-    translate_input(argv[1], type, argv[3], argv[4]);
+        int type=atoi("1");
+        translate_input(argv[1],type,argv[3],argv[4]);
+        
+        //Remove Duplicate Edges and Self Loops; Create Undirected Graphs
+        // process_to_simple_undirected();
+        q=clock()-q;
+        cout << "Total Time for Preprocessing"<< ((float)q)/CLOCKS_PER_SEC <<"\n";
+        
+        /***** Preprocessing to Graph (GUI) ***********/
+        
+        
+        /******* Read Graph (GUI) and Create Reverse Map*****************/
+        //Obtain the list of edges.
+        q=clock();
+        readin_network(&x1,argv[3],nodes);
+          readin_network(&x2,argv[3],nodes);
+        
+        //Create Reversemap
+        
+        nodes=x1.size();
+        create_map(argv[4],&revmap);
+        
+        q=clock()-q;
+        cout << "Total Time for Reading Network"<< ((float)q)/CLOCKS_PER_SEC <<"\n";
+    
+        int count = get_max_no_of_network(x1) + 1;
+            int start_core = 2, end_core = 4; // count - 1;
 
-    // Remove Duplicate Edges and Self Loops; Create Undirected Graphs
-    // process_to_simple_undirected();
-    q = clock() - q;
-    cout << "Total Time for Preprocessing: " << ((float)q) / CLOCKS_PER_SEC << "\n";
+        cout << count << endl;
+    // ... Your code ...
 
-    /***** Preprocessing to Graph (GUI) ***********/
+ vector<int> degreeDistributionBefore1 = getDegreeDistribution(x1);
+    cout << "Before K Core Degree Distribution Before Swapping:\n";
+    printDegreeDistribution(degreeDistributionBefore1);
 
-    /******* Read Graph (GUI) and Create Reverse Map*****************/
-    // Obtain the list of edges.
-    q = clock();
-    readin_network(&x1, argv[3], nodes);
-
-    // Create Reversemap
-
-    nodes = x1.size();
-    create_map(argv[4], &revmap);
-
-    q = clock() - q;
-    cout << "Total Time for Reading Network: " << ((float)q) / CLOCKS_PER_SEC << "\n";
-
-    // Get the max no of vertex in graph.
-    int count = get_max_no_of_network(x1) + 1;
-
-    // set start and end of kcore range.
-    int start_core = 2, end_core = 4; // count - 1;
 
     // Calculate the graph per kcore.
     vector<int> kcoresPerVertex(count, 0);
@@ -430,9 +523,7 @@ int main(int argc, char* argv[]) {
         cout << "---------" << (k - 1) << "-core graph------------" << endl;
         // Calculate kcore graph and vertices removed.
         calculateGraphCore(x1, kcoreGraph, k, removedVertices, false);
-
-        //print_network(kcoreGraph, "***** edges ******");
-
+        
         cout << "\tvertices with " << (k - 1) << "-core: ";
 
         // Sort the removed vertices by using heap sort
@@ -455,17 +546,19 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < count; ++i)
         cout << "\t" << i << "-th vertex's kcore: " << kcoresPerVertex[i] << endl;
 
-    // Iterate over all pairs of nodes
-    for (int node1 = 0; node1 < x1.size(); ++node1) {
-        for (int node2 = node1 + 1; node2 < x1.size(); ++node2) {
-            // Call swapNonAdjacentNodes for each pair of nodes
-            swapNonAdjacentNodes(x1, node1, node2);
-        }
-    }
+    // Calculate and print degree distribution before and after swapping
+    vector<int> degreeDistributionBefore = getDegreeDistribution(x2);
+    cout << "Degree Distribution Before Swapping:\n";
+    printDegreeDistribution(degreeDistributionBefore);
 
-    // Print modified network
-    print_network(x1, "Modified Network");
+    // Perform swapping or other operations
+
+    network_swap(x2);
+
+    vector<int> degreeDistributionAfter = getDegreeDistribution(x2);
+    cout << "Degree Distribution After Swapping:\n";
+   printDegreeDistribution(degreeDistributionAfter);
+
     cout << endl << endl;
-
     return 0;
 }

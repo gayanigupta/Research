@@ -74,5 +74,5 @@ kcoreu: 	updated_k_core.cpp
 	g++ -g -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) updated_k_core.cpp -o coreu	
 allcores: 	all_kcores.cpp      
 	g++ -g -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) all_kcores.cpp -o coreall	
-testkcores: 	test_kcores.cpp      
-	g++ -g -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) test_kcores.cpp -o testkcores
+testkcores: 	test_kcores_needs_testing.cpp      
+	g++ -g -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) test_kcores_needs_testing.cpp -o testkcores
