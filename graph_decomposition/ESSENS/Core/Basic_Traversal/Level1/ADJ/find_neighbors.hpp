@@ -448,6 +448,19 @@ void get_neighbors(vector<int> nodes, A_Network X, vector<Edge> *neighbors, vect
 	
 return;}
 
+
+void getNeighbors(int vertex, const std::vector<Edge>& edges, std::vector<int>& neighbors) {
+    neighbors.clear(); // Clear the vector before populating it with new neighbors
+
+    for (const Edge& edge : edges) {
+        if (edge.node1 == vertex) {
+            neighbors.push_back(edge.node1);
+        } else if (edge.node2 == vertex) {
+            neighbors.push_back(edge.node2);
+        }
+    }
+}
+
 /******* End of Functions **************/
 
 #endif
