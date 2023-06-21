@@ -7,6 +7,7 @@
 #include "input_to_network.hpp"
 #include "structure_defs.hpp"
 
+
 // OUTPUT HEADERS
 #include "printout_network.hpp"
 #include "printout_others.hpp"
@@ -98,125 +99,134 @@ bool isSubset(const std::set<int> &set1, const std::set<int> &set2)
 
 */
 
+void getNeighbors(int vertex, const std::vector<Edge>& edges, std::vector<int>& neighbors) {
+    neighbors.clear(); // Clear the vector before populating it with new neighbors
 
-std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationOrder(const std::vector<Edge> &edges, int numVertices)
-{
+    for (const Edge& edge : edges) {
+        if (edge.node1 == vertex) {
+            neighbors.push_back(edge.node2);
+        } else if (edge.node2 == vertex) {
+            neighbors.push_back(edge.node1);
+        }
+    }
+}
+
+std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationOrder(const std::vector<Edge>& edges, int numVertices) {
     std::vector<Edge> chordalEdges;
     std::vector<int> eliminationOrder;
 
-    std::vector<int> LP(numVertices, -1);
+    std::vector<int> LP(numVertices, 0); // Lowest parent initialization set to 0
     std::vector<std::set<int> > C(numVertices, std::set<int>());
 
-    std::vector<bool> processed(numVertices, false);
     std::vector<bool> Q1Array(numVertices, false);
-
     std::vector<bool> newQ1Array(numVertices, false);
 
-    for (const Edge &edge : edges)
-    {
-        int v = edge.node2;
-        int w = edge.node1;
-        double wt = edge.edge_wt;
+    // Algorithm 1 - Loop over all vertices to identify the neighbors of each vertice
+    vector<int> neighbors;
+    for (int v = 0; v < numVertices; ++v) {
+        // Step 1: Get the neighbors of vertex v
+        getNeighbors(v,edges,neighbors);
+        int lowest = std::numeric_limits<int>::max();
+        int lowestParent =0;
+        cout << "Neigbors of selected vertex "<< v << " : "<<endl;
+        for (int neighbor : neighbors) {
+        
+                // Step 2: Find the neighbor with the smallest id and is smaller than v
+                 if(neighbor< lowest && neighbor < v ) {
+                    lowest=neighbor;
+                    //cout<< "lowest: " << lowest <<endl;
+                    lowestParent = lowest;
+                   // cout<< "lowest parent: " << lowestParent <<endl;
+                    //cout << "Lowest parent of vertex " << v << ": " << lowest << endl;
+                 } else {
+                // Step 3: If a lowest parent is found, print it; otherwise, set lowest parent to 0
+                    //cout << "No lowest parent exists for vertex " << v << ", setting lowest parent to 0" << endl;
+                    lowestParent = 0;
 
-        if (wt != 0 && LP[v] == -1)
-        {
-            LP[v] = w;
-            // processed[v] = true;
+                 }
+                 
+                cout << neighbor << "  ";
 
-            if (!Q1Array[w])
-            {
-                Q1Array[w] = true;
-                C[v].clear();
-            }
+              
+          }
+ std::cout << endl;
+
+        // Step 4: Set LP of v to its lowest parent
+       
+        LP[v] = lowest==std::numeric_limits<int>::max()?0:lowest; // Set LP of v to its next lowest parent
+
+        Q1Array[v] = true;
+    
+}
+
+        // Print the lowestParent and LP at each iteration
+      int i =1;
+      std::cout << "\n After calculating the Lowest parent are : "<<endl;
+        for (i=1; i < numVertices; i++) {
+          
+              cout << "Vertices : " << i <<" Lowest Parent : " << LP[i] <<endl;
+            
         }
-    }
+        cout<<endl;
 
-    while (!isBoolVectorEmpty(Q1Array))
-    {
 
-        fill(newQ1Array.begin(), newQ1Array.end(), false);
+    // Algorithm 1 - Iterations
+    int iteration = 2;
+    while (!isBoolVectorEmpty(Q1Array)) {
+        std::fill(newQ1Array.begin(), newQ1Array.end(), false);
 
-        for (int v = 0; v < numVertices; ++v)
-        {
-            if (Q1Array[v])
-            {
-                for (const Edge &edge : edges)
-                {
+        for (int v = 0; v < numVertices; ++v) {
+            if (Q1Array[v]) {
+                int lowestParent = LP[v]; // Initialize the lowestParent to LP[v]
+
+                // Algorithm 1 - Check edges for chordal properties
+                for (const Edge& edge : edges) {
                     int w = edge.node2;
                     int u = edge.node1;
                     double wt = edge.edge_wt;
-                    // cout<<LP[w]<<endl;
-                    if (LP[w] == v && isSubset(C[w], C[v]))
-                    {
+
+                    // Check if v is the lowest parent of w and v is lower than w
+                    if (LP[w] == v && v < w && isSubset(C[w], C[v])) {
+                        // Update lowest parent if id is lower than the current lowestParent
+                        if (w < lowestParent) {
+                            lowestParent = w;
+                        }
+
                         C[v].insert(w);
                         chordalEdges.push_back(edge);
                         newQ1Array[w] = true;
-                        // processed[w] = true;
-
-                        // Print additional information
-                        std::cout << "Found chordal edge: " << edge.node1 << " - " << edge.node2 << std::endl;
-                        std::cout << "Updated C[" << v << "]: ";
-                        for (int node : C[v])
-                        {
-                            std::cout << node << " ";
-                        }
-                        std::cout << std::endl;
                     }
                 }
 
-                // Q1Array[v] = false;
+                if (lowestParent != LP[v]) {
+                    LP[v] = lowestParent; // Algorithm 1 - Set LP of v to its next lowest parent
+                }
+
+                // Print the lowestParent and LP at each iteration
+                std::cout << "Iteration " << iteration << ": Lowest Parent: " << lowestParent << ", LP: ";
+                for (int i = 0; i < numVertices; ++i) {
+                    std::cout << LP[i] << " ";
+                }
+                std::cout << std::endl;
             }
         }
 
-        // set Q1Array to newQ1Array
-        for (int i = 0; i < numVertices; i++)
-        {
-            Q1Array[i] = newQ1Array[i];
-        }
-    }
-    // Print variable contents
-    std::cout << "LP: ";
-    for (int value : LP)
-    {
-        std::cout << value << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "C:" << std::endl;
-    for (int i = 0; i < numVertices; ++i)
-    {
-        std::cout << "C[" << i << "]: ";
-        for (int node : C[i])
-        {
-            std::cout << node << " ";
-        }
-        std::cout << std::endl;
+        Q1Array = newQ1Array;
+        iteration++;
     }
 
-    std::cout << "Processed: ";
-    for (bool value : processed)
-    {
-        std::cout << value << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "Q1Array: ";
-    for (bool value : Q1Array)
-    {
-        std::cout << value << " ";
-    }
-    std::cout << std::endl;
-
-    for (int v = 0; v < numVertices; ++v)
-    {
-        if (LP[v] == -1)
-        {
+    // Algorithm 1 - Building the maximal chordal subgraph
+    for (int v = 0; v < numVertices; ++v) {
+        if (LP[v] == 0) {
             eliminationOrder.push_back(v);
         }
     }
+    
+
 
     return std::make_pair(chordalEdges, eliminationOrder);
 }
+
 
 int main(int argc, char *argv[])
 {
@@ -255,7 +265,7 @@ int main(int argc, char *argv[])
     cout << "Total Time for Reading Network: " << ((float)q) / CLOCKS_PER_SEC << "\n";
 
     // Populate the edges vector
-    ifstream dataFile(argv[1], ios::in); // Open input file
+    ifstream dataFile(argv[3], ios::in); // Open input file
     string line;
     stringstream linestream;
     while (getline(dataFile, line))
@@ -269,7 +279,9 @@ int main(int argc, char *argv[])
         edge.node1 = node1;
         edge.node2 = node2;
         edge.edge_wt = weight;
+        if (edge.node1 < edge.node2){
         edges.push_back(edge);
+        }
     }
     dataFile.close();
 
