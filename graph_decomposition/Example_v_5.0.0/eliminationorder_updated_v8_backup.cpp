@@ -2,11 +2,7 @@
 #include <list>
 #include <set>
 #include <map>
-#include <vector>
-#include <unordered_map>
-#include <algorithm>
-#include <fstream>
-#include <sstream>
+
 // INPUT HEADERS
 #include "translate_from_input.hpp"
 #include "input_to_network.hpp"
@@ -123,8 +119,7 @@ void getNeighbors(int vertex, const std::vector<Edge> &edges, std::vector<int> &
     }
 }
 
-
-/*std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationOrder(const std::vector<Edge> &edges, int numVertices)
+std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationOrder(const std::vector<Edge> &edges, int numVertices)
 {
     std::vector<Edge> chordalEdges;
     std::vector<int> eliminationOrder;
@@ -247,78 +242,8 @@ void getNeighbors(int vertex, const std::vector<Edge> &edges, std::vector<int> &
     }
 
     return std::make_pair(chordalEdges, eliminationOrder);
-}*/
-void findLowestParent(unordered_map<int, vector<int>> graph, unordered_map<int, int>& lowestParent, vector<int>& eliminationOrder) {
-    while (!graph.empty()) {
-        // Find the vertex with the lowest parent
-        int minVertex = -1;
-        int minParent = INT_MAX;
-
-        for (const auto& entry : graph) {
-            int v = entry.first;
-            if (find(eliminationOrder.begin(), eliminationOrder.end(), v) == eliminationOrder.end()) {
-                int parent = INT_MAX;
-                for (int parentV : entry.second) {
-                    if (lowestParent.find(parentV) != lowestParent.end()) {
-                        parent = min(parent, lowestParent[parentV]);
-                    }
-                }
-
-                if (parent < minParent) {
-                    minVertex = v;
-                    minParent = parent;
-                }
-            }
-        }
-
-        // Add the vertex with the lowest parent to the elimination order
-        eliminationOrder.push_back(minVertex);
-
-        // Update lowest parent for neighbors of the chosen vertex
-        for (int neighbor : graph[minVertex]) {
-            if (lowestParent.find(neighbor) != lowestParent.end() && lowestParent[neighbor] == -1) {
-                lowestParent[neighbor] = eliminationOrder.size() - 1;
-            }
-        }
-
-        // Remove the chosen vertex from the graph
-        graph.erase(minVertex);
-    }
 }
 
-pair<vector<Edge>,vector<int>> findChordalEdgesWithEliminationOrder(const vector<Edge>& inputEdges) {
-    unordered_map<int, vector<int>> graph;
-    for (const auto& edge : inputEdges) {
-        graph[edge.node1].push_back(edge.node2);
-        graph[edge.node2].push_back(edge.node1);
-    }
-
-    unordered_map<int, int> lowestParent;
-    for (const auto& entry : graph) {
-        lowestParent[entry.first] = -1;
-    }
-
-    vector<int> eliminationOrder;
-    findLowestParent(graph, lowestParent, eliminationOrder);
-
-    vector<Edge> chordalEdges;
-    for (int i = static_cast<int>(eliminationOrder.size()) - 2; i >= 0; --i) {
-        int v = eliminationOrder[i];
-        const vector<int>& neighbors = graph[v];
-        for (int neighbor : neighbors) {
-            if (find(eliminationOrder.begin() + i + 1, eliminationOrder.end(), neighbor) == eliminationOrder.end()) {
-                //chordalEdges.emplace_back(v, neighbor);
-               Edge e1;
-            e1.node1 = v;
-             e1.node2 = neighbor;
-             chordalEdges.push_back(e1);
-            }
-
-        }
-    }
-
-    return make_pair(chordalEdges, eliminationOrder);
-}
 /**
  *  ADDING CODE for TREE DECOMPOSITION BELOW
  *
@@ -896,7 +821,7 @@ int main(int argc, char *argv[])
 
     // print(edges);
 
-    std::pair<std::vector<Edge>, std::vector<int> > result = findChordalEdgesWithEliminationOrder(edges);
+    std::pair<std::vector<Edge>, std::vector<int> > result = findChordalEdgesWithEliminationOrder(edges, nodes);
     std::vector<Edge> chordalEdges = result.first;
     std::vector<int> eliminationOrder = result.second;
 
@@ -927,10 +852,10 @@ int main(int argc, char *argv[])
     }
     else
     {
-        for (int node : eliminationOrder)
-        {
-            cout << node << endl;
-        }
+    for (int node : eliminationOrder)
+    {
+        cout << node << endl;
+    }
     }
 
     cout << "Edges vector: " << endl;

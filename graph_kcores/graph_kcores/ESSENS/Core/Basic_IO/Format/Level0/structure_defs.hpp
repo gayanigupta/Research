@@ -23,7 +23,13 @@ using namespace std;
 struct Edge
 { int node1;
 	int node2;
-double edge_wt;};
+double edge_wt;
+Edge:: Edge(){}
+Edge::Edge(int n1, int n2){
+n1=node1;
+n2=node2;
+}
+};
 
 Edge create (int n1, int n2, double wt)
 {
