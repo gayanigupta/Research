@@ -16,6 +16,7 @@ BASIC_IO_FORMAT_OUTPUT=$(BASIC_IO_FORMAT)/Output
 
 Core=$(ESSENS)/Core
 BASIC_ADT=-I $(Core)/Basic_ADT
+BASIC_GRAPH=-I $(Core)/Basic_Graph
 
 BASIC_IO_INC=-I $(BASIC_IO_PREPROCESS)/Exceptions\
  -I $(BASIC_IO_PREPROCESS)/Level0 \
@@ -85,11 +86,12 @@ testpaths: testpaths.cpp
 
 elimv3: eliminationorder_updated_v2.cpp      
 	g++ -g -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) eliminationorder_updated_v2.cpp -o elimv3
+
 elimv8: eliminationorder_updated_v8.cpp     
 	g++ -std=c++14 -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) eliminationorder_updated_v8.cpp -o elimv8
 elimv9: eliminationorder_updated_v9.cpp     
 	g++ -std=c++14 -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) eliminationorder_updated_v9.cpp -o elimv9
 elimv10: eliminationorder_updated_v10.cpp     
-	g++ -std=c++14 -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) eliminationorder_updated_v10.cpp -o elimv10
-elimv11: eliminationorder_updated_v10_split.cpp     
-	g++ -std=c++14 -Wall $(BASIC_ADT) $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) eliminationorder_updated_v10_split.cpp -o elimv11
+	g++ -std=c++14 -Wall $(BASIC_ADT) $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) eliminationorder_updated_v9.cpp -o elimv10
+elimv11: Main.cpp     
+	g++ -std=c++14 -Wall $(BASIC_GRAPH) $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) Main.cpp -o elimv11

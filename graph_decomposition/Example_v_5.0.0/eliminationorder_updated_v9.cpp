@@ -13,6 +13,7 @@
 #include "printout_network.hpp"
 #include "printout_others.hpp"
 
+
 using namespace std;
 
 /**
@@ -924,7 +925,7 @@ int main(int argc, char *argv[])
     {
         cout << edge.node1 << " - " << edge.node2 << " : " << edge.edge_wt << endl;
     }
-
+/*
     //cout << result_tree->nodes.size();
     cout << "Tree output" << endl;
     for (auto node : result_tree->nodes) {
@@ -944,7 +945,7 @@ int main(int argc, char *argv[])
         }
         
     }
-
+*/
 
     return 0;
 }
