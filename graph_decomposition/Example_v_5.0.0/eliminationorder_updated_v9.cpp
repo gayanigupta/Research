@@ -8,11 +8,9 @@
 #include "input_to_network.hpp"
 #include "structure_defs.hpp"
 
-
 // OUTPUT HEADERS
 #include "printout_network.hpp"
 #include "printout_others.hpp"
-
 
 using namespace std;
 
@@ -57,8 +55,8 @@ bool isBoolVectorEmpty(const std::vector<bool> &Q1Array)
 */
 bool isSubset(const std::set<int> &set1, const std::set<int> &set2)
 {
-    //std::cout << "Checking if set1 is a subset of set2..." << std::endl;
-    //std::cout << "set1: ";
+    // std::cout << "Checking if set1 is a subset of set2..." << std::endl;
+    // std::cout << "set1: ";
     /*
     for (int element : set1)
     {
@@ -117,85 +115,100 @@ void getNeighbors(int vertex, const std::vector<Edge>& edges, std::vector<int>& 
     }
 } */
 
-
-void getNeighbours(int vertex, const vector<Edge> &edges, map<int, vector<int> > &adjList){
-    if(adjList.find(vertex) == adjList.end()){
+void getNeighbours(int vertex, const vector<Edge> &edges, map<int, vector<int>> &adjList)
+{
+    if (adjList.find(vertex) == adjList.end())
+    {
         vector<int> temp;
         temp.clear();
         adjList[vertex] = temp;
     }
 
-    for(const Edge& edge : edges){
-        if (edge.node1 == vertex) {
+    for (const Edge &edge : edges)
+    {
+        if (edge.node1 == vertex)
+        {
             adjList[vertex].push_back(edge.node2);
-        } else if (edge.node2 == vertex) {
+        }
+        else if (edge.node2 == vertex)
+        {
             adjList[vertex].push_back(edge.node1);
         }
-    }    
+    }
 }
 
-
-int getLeftMostElem(vector<vector<int>> &setPartition){
+int getLeftMostElem(vector<vector<int>> &setPartition)
+{
     int elem = setPartition[0][0];
-    // remove the 'elem' from the set we got 
+    // remove the 'elem' from the set we got
     setPartition[0].erase(setPartition[0].begin());
     // if the first set  has gone empty, remove it too
-    if(setPartition[0].size() == 0){
+    if (setPartition[0].size() == 0)
+    {
         setPartition.erase(setPartition.begin());
     }
     return elem;
 }
 
-
-void updateSet(vector<int> neighbours, vector<vector<int>> &setPartition){
+void updateSet(vector<int> neighbours, vector<vector<int>> &setPartition)
+{
     vector<vector<int>> tempSets;
-    
-    for(int i = 0; i < setPartition.size(); i++){
+
+    for (int i = 0; i < setPartition.size(); i++)
+    {
         vector<int> left, right;
 
-        for(int j = 0; j < setPartition[i].size(); j++){
-            if(find(neighbours.begin(), neighbours.end(), setPartition[i][j]) != neighbours.end()){
+        for (int j = 0; j < setPartition[i].size(); j++)
+        {
+            if (find(neighbours.begin(), neighbours.end(), setPartition[i][j]) != neighbours.end())
+            {
                 // put that elem in the left
                 left.push_back(setPartition[i][j]);
-            }else{
+            }
+            else
+            {
                 right.push_back(setPartition[i][j]);
             }
         }
 
-        if(left.size() != 0){
+        if (left.size() != 0)
+        {
             tempSets.push_back(left);
         }
-        
-        if(right.size() != 0){
+
+        if (right.size() != 0)
+        {
             tempSets.push_back(right);
         }
     }
 
     // copy the tempSets back to setPartition
     setPartition.clear();
-    for(int i = 0; i < tempSets.size(); i++){
+    for (int i = 0; i < tempSets.size(); i++)
+    {
         setPartition.push_back(tempSets[i]);
     }
-
 }
 
 /* The algorithm below uses LexBFS to find the PEO
-   We use LexBFS to get an ordering of the vertices and 
-   returnt the reverse of it as PEO(Perfect Elimination Order) 
+   We use LexBFS to get an ordering of the vertices and
+   returnt the reverse of it as PEO(Perfect Elimination Order)
 
 */
-std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationOrder(const std::vector<Edge>& edges, int numVertices) {
+std::pair<std::vector<Edge>, std::vector<int>> findChordalEdgesWithEliminationOrder(const std::vector<Edge> &edges, int numVertices)
+{
     vector<Edge> chordalEdges;
-    vector<int> eliminationOrder; 
-    map<int, int> visited; 
+    vector<int> eliminationOrder;
+    map<int, int> visited;
 
-    map<int, vector<int> > adjList; 
+    map<int, vector<int>> adjList;
 
-    vector<vector<int>> setPartition; 
+    vector<vector<int>> setPartition;
 
     vector<int> initSet;
-    
-    for(int v = 0; v < numVertices; v++){
+
+    for (int v = 0; v < numVertices; v++)
+    {
         // get the neighbours of each vertex and store them in an adjacency list
         getNeighbours(v, edges, adjList);
         // initially set visited of all vertices to False(0)
@@ -204,16 +217,18 @@ std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationO
     }
 
     // get chordal edges
-    for(const Edge& edge : edges){
+    for (const Edge &edge : edges)
+    {
         chordalEdges.push_back(edge);
-    } 
+    }
 
     setPartition.push_back(initSet);
 
-    while(setPartition.size() != 0){
+    while (setPartition.size() != 0)
+    {
         // get the leftmost element from the leftmost set
         int u = getLeftMostElem(setPartition);
-            //cout << "Current element in Lex BFS = " << u << endl;
+        // cout << "Current element in Lex BFS = " << u << endl;
         // mark u as visited
         visited[u] = 1;
         // put u in the partially created elimination order
@@ -221,11 +236,12 @@ std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationO
 
         // check u's neighbours and update the sets
         vector<int> neighbours;
-        for(int neighbour : adjList[u]){
-            if(visited[neighbour] == 0){
+        for (int neighbour : adjList[u])
+        {
+            if (visited[neighbour] == 0)
+            {
                 neighbours.push_back(neighbour);
             }
-
         }
 
         updateSet(neighbours, setPartition);
@@ -236,12 +252,12 @@ std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationO
 
     // print the elements of the elimination order
     cout << "Elimination order below \n";
-    for(int i = 0; i < eliminationOrder.size(); i++){
+    for (int i = 0; i < eliminationOrder.size(); i++)
+    {
         cout << eliminationOrder[i] << endl;
     }
 
     return std::make_pair(chordalEdges, eliminationOrder);
-
 }
 
 /*
@@ -264,7 +280,7 @@ std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationO
         int lowestParent =0;
         cout << "Neigbors of selected vertex "<< v << " : "<<endl;
         for (int neighbor : neighbors) {
-        
+
                 // Step 2: Find the neighbor with the smallest id and is smaller than v
                  if(neighbor< lowest && neighbor < v ) {
                     lowest=neighbor;
@@ -278,28 +294,28 @@ std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationO
                     lowestParent = 0;
 
                  }
-                 
+
                 cout << neighbor << "  ";
 
-              
+
           }
         std::cout << endl;
 
         // Step 4: Set LP of v to its lowest parent
-       
+
         LP[v] = lowest==std::numeric_limits<int>::max()?0:lowest; // Set LP of v to its next lowest parent
 
         Q1Array[v] = true;
-    
+
     }
 
         // Print the lowestParent and LP at each iteration
       int i =1;
       std::cout << "\n After calculating the Lowest parent are : "<<endl;
         for (i=1; i < numVertices; i++) {
-          
+
               cout << "Vertices : " << i <<" Lowest Parent : " << LP[i] <<endl;
-            
+
         }
         cout<<endl;
 
@@ -355,17 +371,16 @@ std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationO
             eliminationOrder.push_back(v);
         }
     }
-    
+
 
 
     return std::make_pair(chordalEdges, eliminationOrder);
 }*/
 
-
 /**
  *  ADDING CODE for TREE DECOMPOSITION BELOW
- * 
-*/
+ *
+ */
 
 /**
  * - Description: Creates a tree using the three properties mentioned.
@@ -388,116 +403,132 @@ std::pair<std::vector<Edge>, std::vector<int> > findChordalEdgesWithEliminationO
      4. Return the generated tree.
 */
 
+struct node
+{
+    int data;
+    vector<int> bag_nodes;
+    vector<node *> neighbours;
+    bool flg = 0;
 
-struct node {
-        int data;
-        vector<int> bag_nodes;
-        vector<node*> neighbours;
-        bool flg = 0;
+    node(int k = 0)
+    {
+        data = k;
+        // bag_nodes.push_back(k);
+    }
 
-        node(int k=0) {
-            data = k;
-            //bag_nodes.push_back(k);
+    node(node *nodeToCopy)
+    {
+        data = nodeToCopy->data;
+        // copy the internal contents
+        for (int i = 0; i < nodeToCopy->bag_nodes.size(); i++)
+        {
+            bag_nodes.push_back(nodeToCopy->bag_nodes[i]);
         }
+        flg = nodeToCopy->flg;
+    }
 
-        node(node *nodeToCopy){
-            data = nodeToCopy->data;
-            // copy the internal contents
-            for(int i = 0; i < nodeToCopy->bag_nodes.size(); i++){
-                bag_nodes.push_back(nodeToCopy->bag_nodes[i]);
-            }
-            flg = nodeToCopy->flg;
+    bool isVertexInNode(int x)
+    {
+        // returns true if x in current TreeNode else false
+        for (int i = 0; i < bag_nodes.size(); i++)
+        {
+            if (bag_nodes[i] == x)
+                return true;
         }
+        return false;
+    }
 
-        bool isVertexInNode(int x){
-            // returns true if x in current TreeNode else false
-            for(int i = 0; i < bag_nodes.size(); i++){
-                if(bag_nodes[i] == x)
+    bool isNodeNeighbour(node *p)
+    {
+        // return true if p is already a child of current TreeNode else false
+        for (int i = 0; i < neighbours.size(); i++)
+        {
+            if (neighbours[i]->data == p->data)
+            {
                 return true;
             }
-            return false;
         }
+        return false;
+    }
 
-        bool isNodeNeighbour(node *p){
-            // return true if p is already a child of current TreeNode else false
-            for(int i = 0; i < neighbours.size(); i++){
-                if(neighbours[i]->data == p->data){
-                    return true;
-                }
+    void addVertInNode(int x)
+    {
+        // adds the vertex x to the bag of tree nodes
+        bag_nodes.push_back(x);
+    }
+
+    void addNeighbour(node *p)
+    {
+        if (isNodeNeighbour(p))
+        {
+            return;
+        }
+        // cout << "ADDED child " << endl;
+        neighbours.push_back(p);
+    }
+
+    int getNumCommonVertices(node *p)
+    {
+        // finds and returns the number of common vertices between this node and
+        // treeNode p
+        int numIntersection = 0;
+        for (int i = 0; i < bag_nodes.size(); i++)
+        {
+            if (find(p->bag_nodes.begin(), p->bag_nodes.end(), bag_nodes[i]) != p->bag_nodes.end())
+            {
+                numIntersection += 1;
             }
-            return false;
         }
+        return numIntersection;
+    }
+};
 
-        void addVertInNode(int x){
-            // adds the vertex x to the bag of tree nodes
-            bag_nodes.push_back(x);
-        }
-
-        void addNeighbour(node *p){
-            if(isNodeNeighbour(p)){
-                return;
-            }
-            //cout << "ADDED child " << endl;
-            neighbours.push_back(p);
-        }
-
-        int getNumCommonVertices(node *p){
-            // finds and returns the number of common vertices between this node and 
-            // treeNode p
-            int numIntersection = 0;
-            for(int i = 0; i < bag_nodes.size(); i++){
-                if(find(p->bag_nodes.begin(), p->bag_nodes.end(), bag_nodes[i]) != p->bag_nodes.end()){
-                    numIntersection += 1;
-                }
-            }
-            return numIntersection;
-        }
-        
-    };
-
-
-
-
-struct Tree {
+struct Tree
+{
     int V;
 
-    node* root;
+    node *root;
 
-    std::vector<node*> nodes;
-    
-    Tree(int vv = 0) {
+    std::vector<node *> nodes;
+
+    Tree(int vv = 0)
+    {
         V = vv;
         nodes.reserve(vv);
         root = nodes[0];
-        for (int i = 0; i < V; ++i) {
-            //nodes[i] = new TreeNode;
+        for (int i = 0; i < V; ++i)
+        {
+            // nodes[i] = new TreeNode;
             nodes.push_back(new node);
             nodes[i]->data = i;
             nodes[i]->flg = false;
         }
-
     }
 
-    Tree(Tree *treeToCopy){
+    Tree(Tree *treeToCopy)
+    {
         V = treeToCopy->V;
         nodes.reserve(V);
         root = nodes[0];
-        for(int i = 0; i < V; i++){
+        for (int i = 0; i < V; i++)
+        {
             nodes.push_back(new node(treeToCopy->nodes[i]));
         }
-
     }
 
-
-    void addVertexInTreeNode(int treeNodeIndex, int x){
+    void addVertexInTreeNode(int treeNodeIndex, int x)
+    {
         nodes[treeNodeIndex]->addVertInNode(x);
     }
 
-    int addNode(node p) {
-        for (int i = 0; i < V; i++) if (nodes[i]->data == p.data) {
-            nodes[i]->flg = true;
-            return i;
-        }
+    int addNode(node p)
+    {
+        for (int i = 0; i < V; i++)
+            if (nodes[i]->data == p.data)
+            {
+                nodes[i]->flg = true;
+                return i;
+            }
         return -1;
     }
 
@@ -505,24 +536,31 @@ struct Tree {
         nodes[i]->children.push_back(nodes[k]);
     }*/
 
-    int getNodeIndex(int w) {
-        for (int i = 0; i < V; i++) if (nodes[i]->data == w) return i;
+    int getNodeIndex(int w)
+    {
+        for (int i = 0; i < V; i++)
+            if (nodes[i]->data == w)
+                return i;
     }
 
-    void print(){
-        for(int i = 0; i < V; i++){
-            if(nodes[i]->flg){
+    void print()
+    {
+        for (int i = 0; i < V; i++)
+        {
+            if (nodes[i]->flg)
+            {
                 cout << "Tree Node  " << nodes[i]->data << " - ";
-                for(int j = 0; j < nodes[i]->bag_nodes.size(); j++) {
-                    cout << nodes[i]->bag_nodes[j] << " , " ;
-                } 
+                for (int j = 0; j < nodes[i]->bag_nodes.size(); j++)
+                {
+                    cout << nodes[i]->bag_nodes[j] << " , ";
+                }
                 cout << endl;
             }
         }
     }
 
-
-    void addEdge(int parentIdx, int childIdx){
+    void addEdge(int parentIdx, int childIdx)
+    {
         // add edge
         nodes[parentIdx]->addNeighbour(nodes[childIdx]);
 
@@ -530,120 +568,155 @@ struct Tree {
         nodes[childIdx]->addNeighbour(nodes[parentIdx]);
     }
 
-    void addEdge(node *x, node *y){
-        int p = -1,q = -1;
-        for(int i = 0; i < V; i++){
-            if(nodes[i]->flg && nodes[i]->data == x->data){
+    void addEdge(node *x, node *y)
+    {
+        int p = -1, q = -1;
+        for (int i = 0; i < V; i++)
+        {
+            if (nodes[i]->flg && nodes[i]->data == x->data)
+            {
                 p = i;
             }
 
-            if(nodes[i]->flg && nodes[i]->data == y->data){
+            if (nodes[i]->flg && nodes[i]->data == y->data)
+            {
                 q = i;
             }
         }
 
-        if(p != - 1 && q != -1){
-            addEdge(p,q);
+        if (p != -1 && q != -1)
+        {
+            addEdge(p, q);
         }
     }
 
-
-    void addEdgesBetweenNodes(){
+    void addEdgesBetweenNodes()
+    {
         // We add edge between two tree nodes if they share a common vertex v in the original chordal graph.
-        // The resultant structure may be a cyclic graph instead of tree, however, that's not an issue since 
+        // The resultant structure may be a cyclic graph instead of tree, however, that's not an issue since
         // we will build a minimum spanning tree from clique graph.
-        for(int i = 0; i < V; i++){
-            if(nodes[i]->flg){
-                for(int j = i+1; j < V; j++){
-                    if(nodes[j]->flg){
+        for (int i = 0; i < V; i++)
+        {
+            if (nodes[i]->flg)
+            {
+                for (int j = i + 1; j < V; j++)
+                {
+                    if (nodes[j]->flg)
+                    {
                         // if node i and j have the common vertex then add an edge between them
-                        if(nodes[i]->getNumCommonVertices(nodes[j]) > 0){
-                            addEdge(i,j);
+                        if (nodes[i]->getNumCommonVertices(nodes[j]) > 0)
+                        {
+                            addEdge(i, j);
                         }
-                        
                     }
                 }
-
             }
         }
     }
-
-
+    // Method to clear a node and its associated vertices
+    void clearNode(int nodeIndex)
+    {
+        if (nodeIndex >= 0 && nodeIndex < nodes.size())
+        {
+            nodes[nodeIndex]->bag_nodes.clear(); // Clear the bag of vertices for this node
+            // Set flg to false for all nodes within this tree node
+            for (node *n : nodes[nodeIndex]->neighbours)
+            {
+                n->flg = false;
+            }
+        }
+    }
 };
 
-
-struct Graph {
+struct Graph
+{
     int V;
-    vector<vector<int> > adj;
+    vector<vector<int>> adj;
 
-    Graph(int v,vector<Edge> Edges) {
-        //cout <<" entered grapph" << endl;
+    Graph(int v, vector<Edge> Edges)
+    {
+        // cout <<" entered grapph" << endl;
         V = v;
-        //adj.reserve(V+3);
-        
-        for(int i = 0; i < V+3; i++){
+        // adj.reserve(V+3);
+
+        for (int i = 0; i < V + 3; i++)
+        {
             vector<int> temp_vec;
             adj.push_back(temp_vec);
         }
 
-        for (auto it : Edges) {
-            //cout << " edge from " << it.node1 << " TO " << it.node2 << endl; 
-            //cout << "Printing vect contents " << adj[it.node2].size() << endl;
+        for (auto it : Edges)
+        {
+            // cout << " edge from " << it.node1 << " TO " << it.node2 << endl;
+            // cout << "Printing vect contents " << adj[it.node2].size() << endl;
             adj[it.node1].push_back(it.node2);
             adj[it.node2].push_back(it.node1);
-            
         }
-        //cout << "Done with graph " << endl;
+        // cout << "Done with graph " << endl;
     }
 
-    bool isEdge(int x, int y){
-        if( find(adj[x].begin(), adj[x].end(), y) != adj[x].end() ){
+    bool isEdge(int x, int y)
+    {
+        if (find(adj[x].begin(), adj[x].end(), y) != adj[x].end())
+        {
             return true;
         }
         return false;
     }
 };
 
-
 // Below function retuns the maximal clique from set uncheckedNeighbours
-vector<int> getMaximalClique( Graph& chordalGraph, vector<int> uncheckedNeighbours){
-    
-    if(uncheckedNeighbours.size() <= 1){
+vector<int> getMaximalClique(Graph &chordalGraph, vector<int> uncheckedNeighbours)
+{
+
+    if (uncheckedNeighbours.size() <= 1)
+    {
         return uncheckedNeighbours;
-    }else{
+    }
+    else
+    {
         // check if all the vertices in the set form a clique
         bool isClique = true;
         int n = uncheckedNeighbours.size();
-        for(int i = 0; i < n; i++){
-            for(int j = i+1; j < n; j++){
-                if(!chordalGraph.isEdge(uncheckedNeighbours[i] , uncheckedNeighbours[j]) ){
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = i + 1; j < n; j++)
+            {
+                if (!chordalGraph.isEdge(uncheckedNeighbours[i], uncheckedNeighbours[j]))
+                {
                     isClique = false;
                     break;
                 }
             }
-            if(!isClique){
+            if (!isClique)
+            {
                 break;
             }
         }
 
-        if(isClique){
+        if (isClique)
+        {
             return uncheckedNeighbours;
-        }else{
-            
+        }
+        else
+        {
+
             // recursively find the maximal clique from uncheckedNeighbours
             vector<int> maxClique;
             vector<int>::iterator it;
             int maxCliqueSize = 1;
             vector<int> neighbourSubset = uncheckedNeighbours;
-            //try removing one element at a time from neighbourSubset and recursively check for maximal clique
-            for(int i = 0; i < n; i++){
+            // try removing one element at a time from neighbourSubset and recursively check for maximal clique
+            for (int i = 0; i < n; i++)
+            {
                 it = find(neighbourSubset.begin(), neighbourSubset.end(), uncheckedNeighbours[i]);
                 // remove the element corresponding to iterator 'it' from neighbourSubset
                 neighbourSubset.erase(it);
                 // recursively find the maximal clique from the smaller vector
                 vector<int> result = getMaximalClique(chordalGraph, neighbourSubset);
-                
-                if(maxCliqueSize < result.size()){
+
+                if (maxCliqueSize < result.size())
+                {
                     maxCliqueSize = result.size();
                     maxClique = result;
                 }
@@ -653,44 +726,47 @@ vector<int> getMaximalClique( Graph& chordalGraph, vector<int> uncheckedNeighbou
 
             return maxClique;
         }
-
-
     }
-
 }
 
-
 // returns the index where the node pointed by n exists in 'maxEdge' else returns -1
-int findIfNodeExists(node *n, vector< pair<node*, int> > maxEdge){
-    for(int i = 0; i < maxEdge.size(); i++){
-        if(n->data == maxEdge[i].first->data){
+int findIfNodeExists(node *n, vector<pair<node *, int>> maxEdge)
+{
+    for (int i = 0; i < maxEdge.size(); i++)
+    {
+        if (n->data == maxEdge[i].first->data)
+        {
             return i;
         }
     }
     return -1;
 }
-
-
 // The below function returns the maximum spanning tree of the clique graph
 // Prim's alogorithm is used to find MST
-Tree *getMaxSpanTree(Tree *cliqueGraph){
+Tree *getMaxSpanTree(Tree *cliqueGraph)
+{
     Tree *mst = new Tree(cliqueGraph);
-    map<node*, node*> parent;
-    vector< pair<node*, int> > maxEdge;
+    map<node *, node *> parent;
+    vector<pair<node *, int>> maxEdge;
 
     bool isFirst = true;
-    for(int i = 0; i < cliqueGraph->nodes.size(); i++){
-        if(cliqueGraph->nodes[i]->flg){
-            
-            parent[cliqueGraph->nodes[i]] = NULL;
-            //not.push_back(cliqueGraph->nodes[i]);
+    for (int i = 0; i < cliqueGraph->nodes.size(); i++)
+    {
+        if (cliqueGraph->nodes[i]->flg)
+        {
 
-            pair<node*, int> p;
+            parent[cliqueGraph->nodes[i]] = NULL;
+            // not.push_back(cliqueGraph->nodes[i]);
+
+            pair<node *, int> p;
             p.first = cliqueGraph->nodes[i];
-            if(isFirst){
+            if (isFirst)
+            {
                 p.second = 0;
                 isFirst = false;
-            }else{
+            }
+            else
+            {
                 p.second = -1;
             }
             maxEdge.push_back(p);
@@ -698,126 +774,137 @@ Tree *getMaxSpanTree(Tree *cliqueGraph){
     }
 
     // run the prim's algorithm
-    vector< pair<node*, int> >::iterator it, maxIt;
-    int maxEdgeWeight ;
-    while(maxEdge.size() != 0){
+    vector<pair<node *, int>>::iterator it, maxIt;
+    int maxEdgeWeight;
+    while (maxEdge.size() != 0)
+    {
 
         maxEdgeWeight = -1;
-        //get the node with max edge weight
-        for(it = maxEdge.begin(); it != maxEdge.end(); it++){
-            if(maxEdgeWeight < it->second){
+        // get the node with max edge weight
+        for (it = maxEdge.begin(); it != maxEdge.end(); it++)
+        {
+            if (maxEdgeWeight < it->second)
+            {
                 maxEdgeWeight = it->second;
                 maxIt = it;
             }
         }
 
-        if(parent.find(maxIt->first) != parent.end() && parent[maxIt->first] != NULL){
+        if (parent.find(maxIt->first) != parent.end() && parent[maxIt->first] != NULL)
+        {
             // add an edge between curNode and it's parent
             mst->addEdge(maxIt->first, parent[maxIt->first]);
         }
 
         // update the edge weight to the neighbours if needed
-        for(int i = 0; i < maxIt->first->neighbours.size(); i++){
-            //edgeweight between tree nodes = number of common vertices in their bags
+        for (int i = 0; i < maxIt->first->neighbours.size(); i++)
+        {
+            // edgeweight between tree nodes = number of common vertices in their bags
             int edgeWeight = maxIt->first->getNumCommonVertices(maxIt->first->neighbours[i]);
             // update the edge weight in the 'maxEdge' vector if needed
-            int index = findIfNodeExists(maxIt->first->neighbours[i] , maxEdge);
-            if(index != -1){
+            int index = findIfNodeExists(maxIt->first->neighbours[i], maxEdge);
+            if (index != -1)
+            {
                 // if current edgeWeight is more then update the weight and parent to the curNode
-                if(edgeWeight > maxEdge[i].second){
+                if (edgeWeight > maxEdge[i].second)
+                {
                     maxEdge[i].second = edgeWeight;
-                    //update the parent
-                    if(parent.find(maxIt->first->neighbours[i]) != parent.end()){
+                    // update the parent
+                    if (parent.find(maxIt->first->neighbours[i]) != parent.end())
+                    {
                         parent[maxIt->first->neighbours[i]] = maxIt->first;
                     }
                 }
             }
-            
         }
 
         // remove the element pointed to by 'maxIt' iterator from the maxEdge vector
         maxEdge.erase(maxIt);
-
     }
     return mst;
 }
 
+void printMapping(const std::vector<int> &mapping) {
+    std::cout << "Mapping Vector: ";
+    for (int i = 0; i < mapping.size(); ++i) {
+        std::cout << mapping[i] << " ";
+    }
+    std::cout << std::endl;
+}
 
-//wikepedia: https://en.wikipedia.org/wiki/Tree_decomposition
-//Create a structure for Tree
-Tree *generateTree( Graph& chordalGraph, const vector<int>& eliminationOrder) {
-    int V = chordalGraph.V;
-    cout << "number of vertices in chordal graph " << V << endl;
-    cout << "number of vertices in elimination order " << eliminationOrder.size() << endl;
-    Tree *tree = new Tree(V);
+// The below function returns the maximum spanning tree of the clique graph
+// Prim's alogorithm is used to find MST
+Tree *generateTree(Graph &chordalGraph, const vector<int> &eliminationOrder)
+{
+    int V = chordalGraph.V;       // Get the number of vertices in the chordalGraph
+    Tree *tree = new Tree(V - 1); // Create a new Tree object with V vertices
 
-    // Create a map to store the mapping between vertices in chordalGraph and tree
+    // Create a map to store the mapping between vertices in chordalGraph and tree nodes
     vector<int> mapping(V, -1);
 
-    // Process vertices in the given elimination order
-    for (int i = 0; i < eliminationOrder.size(); ++i) {
+    // Create a vector to keep track of visited vertices
+    // vector<bool> visited(V, false);
+
+    // Create vector with index=elimination seq
+    vector<int> elim_index(V, -1);
+
+    // Fill in elim_index
+    for (int i = 0; i < eliminationOrder.size(); ++i)
+    {
         int v = eliminationOrder[i];
-        node newNode(v);
-        int treeNodeIndex = tree->addNode(newNode);
-        if(treeNodeIndex != -1){
-             mapping[v] = treeNodeIndex;
-             tree->addVertexInTreeNode(mapping[v], v);
-        }
-
-        cout << " mapping of " << v << " is - " << mapping[v] << endl;
-        
-        // we add those neighbours of v which form a clique 
-        vector<int> uncheckedNeighbours;
-        for(int w : chordalGraph.adj[v]){
-            uncheckedNeighbours.push_back(w);
-        }
-
-        // Now check how many of the vertices in 'uncheckedNeighbours' form a clique
-        vector<int> maxClique = getMaximalClique(chordalGraph, uncheckedNeighbours);
-
-        // insert all the elements of the 'maxClique into the current treeNode'
-        for(int w: maxClique){
-            if(mapping[w] == -1){
-                tree->addVertexInTreeNode(mapping[v],w);
-            }
-        }
-        
-        /*// Process neighbors of v that haven't been processed yet
-        for (int w : chordalGraph.adj[v]) {
-            if (mapping[w] == -1) {
-                // add w to the bag of vertices in TreeNode that has vertex v
-                tree->addVertexInTreeNode(mapping[v], w);
-                //Tree::TreeNode newNeighbor(w);
-                //tree.addNode(newNeighbor);
-                //tree.addEdge(i, tree.getNodeIndex(w));
-                //mapping[w] = tree.getNodeIndex(w);
-            }
-        }*/
+        elim_index[v] = i;
     }
 
-    // print bag of verttices (or treeNodes)
-    tree->print();
+    // Process vertices in the given elimination order
+    for (int i = 0; i < eliminationOrder.size() - 1; ++i)
+    {
+        int v = eliminationOrder[i]; // Get the vertex to process from the elimination order
 
-    // add edges now  ---- UPDATE THIS AS PER NEW ALGORITHM
-    /** AS per the algorithm, a tree node x will have edges with only those tree nodes with which 
-       it shares the maximum number of vertices. 
-    **/
-    tree->addEdgesBetweenNodes();
-    /*for(int x = 0; x < V; x++){
-        for(int y: chordalGraph.adj[x]){
-            // check if edge (x,y) is commong among two tree Nodes
-            tree->checkAndAddEdge(x,y);
+        // Create a new node for the tree and add it if not already added
+        if (mapping[v] == -1)
+        {
+            node newNode(v); // Create a new node with vertex v
+                             // visited[v]=true; //Set v to visited
+
+            // bool found=false;
+            // Process neighbors of v
+           // vector<int> neighborsToAdd;
+            for (int w : chordalGraph.adj[v])
+            {
+                // Add to tree node is w is later in elimination seq
+                if (elim_index[w] < elim_index[v])
+                {
+                    newNode.bag_nodes.push_back(w); // Add it to neighborsToAdd
+
+                    // Set neighbor as visited if not already marked
+                    //  if(visited[w]==false)
+                    //{found=true;}
+                    // visited[w] = true;  // Mark the neighbor as visited
+                }
+            }
+            int treeNodeIndex = tree->addNode(newNode); // Add the node to the tree
+            mapping[v] = treeNodeIndex;                 // Store the mapping between chordalGraph vertex and tree node
         }
-    }*/
 
-    // Now build a maximum spanning tree as from the graph generated above using Prim's algorithm
-    Tree *mst = getMaxSpanTree(tree);
-    cout << "Size of tree nodes " << mst->nodes.size() << endl;
+    }
 
-    return mst;
+for(int i=0;i<tree->nodes.size();i++)
+{
+    cout << "Node id is:" << i  << "\n";
+    for(int j=0; j< tree->nodes.at(i)->bag_nodes.size(); j++)
+    {
+        cout << tree->nodes.at(i)->bag_nodes[j] << " ";
+    }
+    cout <<"\n";
 }
 
+    // Build the maximum spanning tree from the generated tree
+    // Tree *mst = getMaxSpanTree(tree);  // Call a function to construct the maximum spanning tree
 
+    // return mst;  // Return the maximum spanning tree
+     printMapping(mapping);
+    return tree; // Return tree
+}
 
 int main(int argc, char *argv[])
 {
@@ -855,6 +942,7 @@ int main(int argc, char *argv[])
     q = clock() - q;
     cout << "Total Time for Reading Network: " << ((float)q) / CLOCKS_PER_SEC << "\n";
 
+    print_network(x1);
     // Populate the edges vector
     ifstream dataFile(argv[3], ios::in); // Open input file
     string line;
@@ -867,32 +955,32 @@ int main(int argc, char *argv[])
         int node1, node2;
         double weight;
         linestream >> node1 >> node2 >> weight;
-        vertex_N = max(vertex_N, max(node1, node2)) ;
+        vertex_N = max(vertex_N, max(node1, node2));
         Edge edge;
         edge.node1 = node1;
         edge.node2 = node2;
         edge.edge_wt = weight;
-        if (edge.node1 < edge.node2){
-        edges.push_back(edge);
+        if (edge.node1 < edge.node2)
+        {
+            edges.push_back(edge);
         }
     }
     dataFile.close();
 
-    //print(edges);
+    // print(edges);
 
     vertex_N = vertex_N + 1;
 
-    std::pair<std::vector<Edge>, std::vector<int> > result = findChordalEdgesWithEliminationOrder(edges, nodes);
+    std::pair<std::vector<Edge>, std::vector<int>> result = findChordalEdgesWithEliminationOrder(edges, nodes);
     std::vector<Edge> chordalEdges = result.first;
     std::vector<int> eliminationOrder = result.second;
 
-    //cout << "Generating chordal graph" << endl;
+    // cout << "Generating chordal graph" << endl;
     Graph chordalGraph(vertex_N, chordalEdges);
-    //cout << "Fine till here" << endl;
+    // cout << "Fine till here" << endl;
 
     Tree *result_tree = generateTree(chordalGraph, eliminationOrder);
-    //cout << "Chordal Edges: " << endl;
-
+    // cout << "Chordal Edges: " << endl;
 
     cout << "Chordal Edges: " << endl;
     if (chordalEdges.empty())
@@ -925,27 +1013,38 @@ int main(int argc, char *argv[])
     {
         cout << edge.node1 << " - " << edge.node2 << " : " << edge.edge_wt << endl;
     }
-/*
-    //cout << result_tree->nodes.size();
+
+    // cout << result_tree->nodes.size();
     cout << "Tree output" << endl;
-    for (auto node : result_tree->nodes) {
-        cout << "node " << node->data << " has " << node->bag_nodes.size()<<" vertexes:" << endl;;
-        for (int i = 0; i < node->bag_nodes.size(); i++) cout << node->bag_nodes[i] << " " ;;
+    for (auto node : result_tree->nodes)
+    {
+        // cout << "node " << node->data << " has " << node->bag_nodes.size() << " vertexes:" << endl;
+        // ;
+        cout << "node " << node->data << " has " << node->bag_nodes.size() << " neighbors:" << endl;
+        for (int i = 0; i < node->bag_nodes.size(); i++)
+        {
+            cout << node->bag_nodes[i] << " ";
+        }
+        cout << endl;
+        for (int i = 0; i < node->bag_nodes.size(); i++)
+            cout << node->bag_nodes[i] << " ";
+        ;
         cout << endl;
     }
 
     cout << "Printing edges between Tree Nodes below: " << endl;
-    for (auto node : result_tree->nodes) {
-        if (node->neighbours.size() > 0){
+    for (auto node : result_tree->nodes)
+    {
+        if (node->neighbours.size() > 0)
+        {
             cout << "Tree Node " << node->data << " had edges to following tree nodes: " << endl;
-            for(int i = 0; i < node->neighbours.size(); i++){
-                cout << node->neighbours[i]->data << " "; 
+            for (int i = 0; i < node->neighbours.size(); i++)
+            {
+                cout << node->neighbours[i]->data << " ";
             }
             cout << endl;
         }
-        
     }
-*/
 
     return 0;
 }

@@ -1,0 +1,25 @@
+1. Initialize an empty set Q1 and Q2.
+2. For each vertex v in the graph:
+   - Find the lowest parent w of v.
+   - If w is not empty:
+     - Set LP[v] to w.
+     - If w is not in Q1:
+       - Add w to Q1.
+       - Set C[v] to an empty set.
+3. While Q1 is not empty:
+   - Create a new empty set newQ1.
+   - For each vertex v in Q1:
+     - For each neighbor w of v:
+       - If LP[w] is equal to v and C[w] is a subset of C[v]:
+         - Add w to the chordal set of v (C[v]).
+         - Add the edge (v, w) to the chordal edges (EC).
+         - Add w to newQ1.
+   - Set Q1 to newQ1.
+4. Find the nodes without parents:
+   - For each vertex v in the graph:
+     - If LP[v] is -1:
+       - Add v to the set of nodes without parents.
+   - For each node v in the set of nodes without parents:
+     - If v is chordal with another node:
+       - Eliminate the chordal node first.
+5. Return the chordal edges (EC) and the elimination order.

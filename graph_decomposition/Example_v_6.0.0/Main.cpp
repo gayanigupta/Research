@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     cout << "Total Time for Reading Network: " << ((float)q) / CLOCKS_PER_SEC << "\n";
 
     // Populate the edges vector
-    ifstream dataFile(argv[3], ios::in); // Open input file
+   ifstream dataFile(argv[3], ios::in); // Open input file
     string line;
     stringstream linestream;
     int vertex_N = 0;
@@ -89,12 +89,8 @@ int main(int argc, char *argv[])
     //print(edges);
 
     vertex_N = vertex_N + 1;
-
 	
 	vector<vector<int>> graph;
-
-
-
 
 	if(BuildGraph(argv[1], graph))
 	{

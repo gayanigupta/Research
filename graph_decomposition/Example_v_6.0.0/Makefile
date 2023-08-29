@@ -95,3 +95,5 @@ elimv10: eliminationorder_updated_v10.cpp
 	g++ -std=c++14 -Wall $(BASIC_ADT) $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) eliminationorder_updated_v9.cpp -o elimv10
 elimv11: Main.cpp     
 	g++ -std=c++14 -Wall $(BASIC_GRAPH) $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) Main.cpp -o elimv11
+elimv12: eliminationorder_updated_V12.cpp     
+	g++ -std=c++14 -Wall $(BASIC_IO_INC) $(BASIC_SETOP_INC) $(BASIC_TRAVERSAL_INC) $(BASIC_CHANGE_INC) $(BASIC_ANALYSIS_INC) eliminationorder_updated_V12.cpp -o elimv12

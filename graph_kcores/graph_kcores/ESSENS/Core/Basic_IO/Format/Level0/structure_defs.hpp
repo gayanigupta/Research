@@ -29,6 +29,11 @@ Edge::Edge(int n1, int n2){
 n1=node1;
 n2=node2;
 }
+Edge::Edge(int n1, int n2, double weight){
+n1=node1;
+n2=node2;
+edge_wt = weight;
+}
 };
 
 Edge create (int n1, int n2, double wt)

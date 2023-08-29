@@ -40,55 +40,19 @@ int main(int argc, char *argv[])
         cout << "INPUT ERROR:: Could not open file\n";
         return 0;
     }
-
-    A_Network x1;
-    int nodes = -1;
-    map_int_st revmap;
-    int type = atoi("1");
-    translate_input(argv[1], type, argv[3], argv[4]);
-
-    q = clock() - q;
-    cout << "Total Time for Preprocessing: " << ((float)q) / CLOCKS_PER_SEC << "\n";
-
-    q = clock();
-    readin_network(&x1, argv[3], nodes);
-    nodes = x1.size();
-    create_map(argv[4], &revmap);
-    q = clock() - q;
-    cout << "Total Time for Reading Network: " << ((float)q) / CLOCKS_PER_SEC << "\n";
-
     // Populate the edges vector
-    ifstream dataFile(argv[3], ios::in); // Open input file
-    string line;
-    stringstream linestream;
-    int vertex_N = 0;
-    while (getline(dataFile, line))
-    {
-        linestream.clear();
-        linestream << line;
-        int node1, node2;
-        double weight;
-        linestream >> node1 >> node2 >> weight;
-        vertex_N = max(vertex_N, max(node1, node2)) ;
-        Edge edge;
-        edge.node1 = node1;
-        edge.node2 = node2;
-        edge.edge_wt = weight;
-        if (edge.node1 < edge.node2){
-        edges.push_back(edge);
-        }
+     ifstream inputFile(argv[3]);
+    if (!inputFile) {
+        cerr << "Error opening the file." << endl;
+        return 1;
     }
-   // dataFile.close();
-
-    //print(edges);
-
-    vertex_N = vertex_N + 1;
-
 
     int n = 0; // Number of vertices in the graph
     vector<vector<int>> graph;
     set<int> verticesSet;
-    while (getline(dataFile, line)) {
+
+    string line;
+    while (getline(inputFile, line)) {
         int u, v;
         istringstream iss(line);
         if (!(iss >> u >> v)) {
@@ -112,10 +76,10 @@ int main(int argc, char *argv[])
     }
 
     // Rewind the input file and re-read edges, now adding them to the graph
-    dataFile.clear();
-    dataFile.seekg(0);
+    inputFile.clear();
+    inputFile.seekg(0);
 
-    while (getline(dataFile, line)) {
+    while (getline(inputFile, line)) {
         int u, v;
         istringstream iss(line);
         if (!(iss >> u >> v)) {
@@ -128,13 +92,14 @@ int main(int argc, char *argv[])
         addEdge(graph, reindexedU, reindexedV);
     }
 
-    dataFile.close();
-
+    inputFile.close();
+    cout<<graph.size();
     // Calculate the perfect elimination order using the Lex-M algorithm
     vector<int> eliminationOrder = findPerfectEliminationOrder(graph);
 
     // Find the chordal edges using the elimination order
     findChordalEdgesWithEliminationOrder(graph, eliminationOrder);
+
 
     for (int i = 0; i < eliminationOrder.size(); i++)
         cout << eliminationOrder[i] << endl;

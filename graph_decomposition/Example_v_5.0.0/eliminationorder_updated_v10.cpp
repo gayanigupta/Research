@@ -175,7 +175,8 @@ int main(int argc, char *argv[])
         }
     }
     //dataFile.close();
-
+dataFile.clear();
+    dataFile.seekg(0);
     //print(edges);
 
     vertex_N = vertex_N + 1;
