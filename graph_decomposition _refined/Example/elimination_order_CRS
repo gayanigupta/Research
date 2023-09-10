@@ -56,13 +56,11 @@ std::pair<std::vector<Edge>, std::vector<int>> findChordalEdgesWithEliminationOr
     std::vector<Edge> chordalEdges;
     std::vector<int> eliminationOrder;
     
-    // Your existing chordal edge and elimination order code goes here
     
     return std::make_pair(chordalEdges, eliminationOrder);
 }
 
 Tree* generateTree(const Graph& chordalGraph, const std::vector<int>& eliminationOrder) {
-    // Your existing tree generation code goes here
 
     return nullptr; // Return the generated tree
 }
