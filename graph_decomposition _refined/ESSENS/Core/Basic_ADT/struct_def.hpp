@@ -439,6 +439,7 @@ Tree *generateTree(Graph &chordalGraph,  Array<int> &eliminationOrder)
 {
     int V = chordalGraph.V;  // Get the number of vertices in the chordalGraph
     Tree *tree = new Tree(V);  // Create a new Tree object with V vertices
+int eliminationOrder[6]= {0,3,2,4,5,1};
 
     // Create a map to store the mapping between vertices in chordalGraph and tree nodes
     Array<int> mapping(V, -1);
@@ -450,6 +451,7 @@ Tree *generateTree(Graph &chordalGraph,  Array<int> &eliminationOrder)
     // Process vertices in the given elimination order
     for(int i = 0; i < eliminationOrder.size(); ++i){
         int v = eliminationOrder[i];
+        cout <<"my V:" << v <<"\n";
         // make a new Tree Node for this vertex if and only some of its neighbour is still unvisited
         if(isSomeNeighbourUnvisited(chordalGraph, visited, v)){
 
