@@ -1,0 +1,37 @@
+vertex1:  0
+vertex2: 1
+0::6
+vertex1:  0
+vertex2: 2
+vertex1:  1
+vertex2: 2
+1::8
+vertex1:  1
+vertex2: 3
+vertex1:  1
+vertex2: 4
+vertex1:  2
+vertex2: 3
+2::11
+vertex1:  3
+vertex2: 5
+3::12
+vertex1:  4
+vertex2: 5
+4::13
+6 0
+8 1
+11 2
+12 3
+13 4
+-1 5
+1 6
+2 7
+2 8
+3 9
+4 10
+3 11
+5 12
+5 13
+Number of Vertices: 6
+Number of Edges: 7
