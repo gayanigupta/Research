@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include "csr-bagging-tree-creation.cpp"
 using namespace std;
 
 // Function to find chordal edges with elimination order.
@@ -70,7 +71,7 @@ void findChordalEdgesWithEliminationOrder(int *graph, int numVertices, int *elim
                       << std::endl;
 
             // Check if the neighbors of the lowest parent are a subset of the current node's neighbors then mark all 
-            // the edges the second array(current node's neighbors) as chordal
+            // consider the edges the second array(current node's neighbors) as chordal
             int indexArr1 = graph[i];
             int indexArr2 = graph[lowestParents[i]];
 
@@ -134,7 +135,18 @@ void findChordalEdgesWithEliminationOrder(int *graph, int numVertices, int *elim
         }
     }
 
+
+    
+
     // Clean up dynamic memory
     delete[] lowestParents;
     delete[] chordalEdges;
+
+    int *bags = new int[numVertices * (numVertices + 1)]; // Assuming a maximum of numVertices bags
+
+    // Call the function to create bags and link them
+   //createBags(eliminationOrder, graph, bags, numVertices);
+
+    // Clean up dynamic memory
+    delete[] bags;
 }

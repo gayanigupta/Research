@@ -42,8 +42,8 @@ void readInputFile(const std::string &filename, int &numEdges, int *graph, int &
         int vertex1, vertex2;
         double weight;
         inputFile >> vertex1 >> vertex2 >> weight;
-        // std::cout<< "vertex1:  "<<vertex1<< std::endl;
-        // std::cout<< "vertex2: "<<vertex2<< std::endl;
+         //std::cout<< "vertex1:  "<<vertex1<< std::endl;
+         //std::cout<< "vertex2: "<<vertex2<< std::endl;
         // std::cout<< vertex2<< std::endl;
 
         // If vertex1 is not equal to currentNode, update currentNode to vertex1.
@@ -57,6 +57,7 @@ void readInputFile(const std::string &filename, int &numEdges, int *graph, int &
 
         EIndex++;
     }
+
     for (int i = 0; i <= numVertices + numEdges; i++)
     {
         std::cout << graph[i] << " " << i << std::endl;
@@ -111,6 +112,11 @@ int main(int argc, char *argv[])
    std::cout<<"size of graph:"<<sizeof(graph)/sizeof(int)<<std::endl;
 
     findChordalEdgesWithEliminationOrder(graph, numVertices, eliminationOrder,numEdges);
+
+    int *bags = new int[numVertices * (numVertices + 1)]; // Assuming a maximum of numVertices bags
+
+        // Call the function to create bags and link them
+    createBags(eliminationOrder, graph, bags, numVertices);
 
     // Clean up allocated memory.
    // delete[] graph;
