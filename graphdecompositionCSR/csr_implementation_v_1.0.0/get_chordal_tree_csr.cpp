@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include <queue>
 
 class ChordalGraph {
@@ -12,10 +13,7 @@ private:
     int* bagParents;
 
 public:
-    ChordalGraph(int v) : vertices(v) {
-        rowPtr = new int[v + 1]();
-        bagParents = new int[v]();
-    }
+    ChordalGraph(int v) : vertices(v), rowPtr(new int[v + 1]()), colIndex(nullptr), eliminationOrder(nullptr), bags(nullptr), bagParents(new int[v]()) {}
 
     ~ChordalGraph() {
         delete[] rowPtr;
@@ -33,89 +31,101 @@ public:
         for (int i = 1; i <= vertices; ++i) {
             rowPtr[i] += rowPtr[i - 1];
         }
-        colIndex = new int[rowPtr[vertices]];
+        colIndex = new int[rowPtr[vertices]]();
     }
 
-void extractMaximalChordalSubgraph() {
-    // Create an array to mark vertices as eliminated or not
-    bool* eliminated = new bool[vertices]();
+    void extractMaximalChordalSubgraph() {
+        eliminationOrder = new int[vertices];
+        for (int i = 0; i < vertices; ++i) {
+            int maxDegree = -1;
+            int maxVertex = -1;
 
-    // Assuming a greedy elimination order
-    for (int i = 0; i < vertices; ++i) {
-        int v = eliminationOrder[i];
+            for (int v = 0; v < vertices; ++v) {
+                if (rowPtr[v + 1] - rowPtr[v] > maxDegree) {
+                    maxDegree = rowPtr[v + 1] - rowPtr[v];
+                    maxVertex = v;
+                }
+            }
 
-        if (!eliminated[v]) {
-            // Mark v and its non-neighbor vertices as eliminated
-            eliminated[v] = true;
+            eliminationOrder[i] = maxVertex;
+            rowPtr[maxVertex + 1] = rowPtr[maxVertex];
 
-            for (int w = 0; w < vertices; ++w) {
-                if (!eliminated[w] && rowPtr[w] > 0 && colIndex[rowPtr[w] - 1] == v) {
-                    eliminated[w] = true;
+            std::cout << "Elimination Order[" << i << "]: " << maxVertex << std::endl;
+        }
+
+        bool* eliminated = new bool[vertices]();
+        int* newColIndex = new int[rowPtr[vertices]];
+        int* newRowPtr = new int[vertices + 1]();
+
+        int newIndex = 0;
+        for (int i = 0; i < vertices; ++i) {
+            int v = eliminationOrder[i];
+
+            if (!eliminated[v]) {
+                std::cout << "Processing vertex: " << v << std::endl;
+
+                for (int j = rowPtr[v]; j < rowPtr[v + 1]; ++j) {
+                    int w = colIndex[j];
+                    if (!eliminated[w]) {
+                        newColIndex[newIndex++] = w;
+                        std::cout << "Adding neighbor: " << w << std::endl;
+                    }
+                }
+                newRowPtr[v + 1] = newIndex;
+
+                eliminated[v] = true;
+                for (int w = 0; w < vertices; ++w) {
+                    if (!eliminated[w] && rowPtr[w] > 0 && colIndex[rowPtr[w] - 1] == v) {
+                        eliminated[w] = true;
+                        std::cout << "Marking as eliminated: " << w << std::endl;
+                    }
                 }
             }
         }
+
+        delete[] colIndex;
+        colIndex = newColIndex;
+        rowPtr = newRowPtr;
+
+        delete[] eliminated;
+        delete[] eliminationOrder;
     }
 
-    // Create a new CSR representation for the chordal subgraph
-    int* newColIndex = new int[vertices * vertices]();
-    int* newRowPtr = new int[vertices + 1]();
-
-    int newIndex = 0;
-    for (int i = 0; i < vertices; ++i) {
-        if (!eliminated[i]) {
-            for (int j = rowPtr[i]; j < rowPtr[i + 1]; ++j) {
-                int w = colIndex[j];
-                if (!eliminated[w]) {
-                    newColIndex[newIndex++] = w;
-                }
-            }
-            newRowPtr[i + 1] = newIndex;
-        }
-    }
-
-    // Cleanup old CSR representation
-    delete[] colIndex;
-    delete[] rowPtr;
-
-    // Assign the new CSR representation
-    colIndex = newColIndex;
-    rowPtr = newRowPtr;
-
-    delete[] eliminated;
-}
     void findBags() {
         bags = new int[vertices * vertices]();
         int* bagsSize = new int[vertices]();
+        int* visited = new int[vertices]();
 
         for (int v = 0; v < vertices; ++v) {
-            int bagSize = 1; // Initialize with the vertex itself
-            bags[v * vertices] = v;
+            if (visited[v] == 0) {
+                int bagSize = 0;
+                int current = v;
 
-            for (int i = rowPtr[v]; i < rowPtr[v + 1]; ++i) {
-                int w = colIndex[i];
+                while (current != -1 && visited[current] == 0) {
+                    visited[current] = 1;
+                    bags[v * vertices + bagSize++] = current;
 
-                if (bagParents[w] == -1) {
-                    // If w does not have a parent bag, create a new bag
-                    for (int j = 0; j < bagSize; ++j) {
-                        bags[v * vertices + bagSize + j] = bags[w * vertices + j];
-                        bagParents[w] = v;
+                    int nextNeighbor = -1;
+                    for (int i = rowPtr[current]; i < rowPtr[current + 1]; ++i) {
+                        int w = colIndex[i];
+                        if (visited[w] == 0 && bagParents[w] == current) {
+                            nextNeighbor = w;
+                            break;
+                        }
                     }
-                    bagSize += bagSize;
-                } else {
-                    // If w has a parent bag, link the bags using the common vertex
-                    int commonVertex = bags[v * vertices]; // Assuming the first vertex in each bag is the common vertex
-                    for (int j = 0; j < bagSize; ++j) {
-                        bags[bagParents[w] * vertices + bagSize + j] = bags[v * vertices + j];
-                    }
-                    bagParents[v] = bagParents[w];
-                    bagSize += bagSize;
+
+                    current = nextNeighbor;
+                }
+
+                bagParents[current] = v;
+                bagsSize[v] = bagSize;
+
+                for (int i = 0; i < bagSize; ++i) {
+                    visited[bags[v * vertices + i]] = 0;
                 }
             }
-
-            bagsSize[v] = bagSize;
         }
 
-        // Update bags to trim excess space
         int* trimmedBags = new int[vertices * vertices]();
         for (int v = 0; v < vertices; ++v) {
             for (int j = 0; j < bagsSize[v]; ++j) {
@@ -127,6 +137,7 @@ void extractMaximalChordalSubgraph() {
         bags = trimmedBags;
 
         delete[] bagsSize;
+        delete[] visited;
     }
 
     void printBags() const {
@@ -144,44 +155,36 @@ void extractMaximalChordalSubgraph() {
 int main(int argc, char *argv[]) {
     if (argc < 4) {
         std::cerr << "Usage: " << argv[0] << " <file> <numVertices> <numEdges>" << std::endl;
-        return 1; // Exit with an error code
+        return 1;
     }
 
     const char *filename = argv[1];
     int numVertices = std::atoi(argv[2]);
     int numEdges = std::atoi(argv[3]);
 
-    // Create ChordalGraph instance
     ChordalGraph myChordalGraph(numVertices);
 
-    // Read data from the file and populate the graph
     std::ifstream inputFile(filename);
     if (!inputFile.is_open()) {
         std::cerr << "Error: Unable to open file " << filename << std::endl;
-        return 1; // Exit with an error code
+        return 1;
     }
 
     for (int i = 0; i < numEdges; ++i) {
         int v1, v2;
         inputFile >> v1 >> v2;
-        // Assuming an undirected graph
         myChordalGraph.addEdge(v1, v2);
         myChordalGraph.addEdge(v2, v1);
     }
 
-    // Close the input file
     inputFile.close();
 
-    // Build CSR representation
     myChordalGraph.buildCSR();
 
-    // Extract maximal chordal subgraph
     myChordalGraph.extractMaximalChordalSubgraph();
 
-    // Find bags and link them
     myChordalGraph.findBags();
 
-    // Print the bags
     myChordalGraph.printBags();
 
     return 0;
