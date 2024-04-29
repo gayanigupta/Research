@@ -14,7 +14,7 @@
 // if the verex one is not eql to curr_node
 // assign current node E-index
 // else assign array index the next vertex in the input file read line
-// each line of the imnput file ha a start vertexa nd an end vertex
+// each line of the imnput file has a start vertex and an end vertex
 // increment E-index
 
 #include <iostream>
@@ -51,7 +51,7 @@ void readInputFile(const std::string &filename, int &numEdges, int *graph, int &
         {
             currentNode = vertex1;
             graph[currentNode] = EIndex;
-            std::cout << currentNode << "::" << EIndex << "\n";
+            //std::cout << currentNode << "::" << EIndex << "\n";
         }
         graph[EIndex] = vertex2;
 
@@ -109,14 +109,11 @@ int main(int argc, char *argv[])
     std::cout << "Number of Vertices: " << numVertices << std::endl;
     std::cout << "Number of Edges: " << numEdges << std::endl;
    
-   std::cout<<"size of graph:"<<sizeof(graph)/sizeof(int)<<std::endl;
-
+   //std::cout<<"size of graph:"<<sizeof(graph)/sizeof(int)<<std::endl;
+//End of DEBUG
     findChordalEdgesWithEliminationOrder(graph, numVertices, eliminationOrder,numEdges);
 
     int *bags = new int[numVertices * (numVertices + 1)]; // Assuming a maximum of numVertices bags
-
-        // Call the function to create bags and link them
-    createBags(eliminationOrder, graph, bags, numVertices);
 
     // Clean up allocated memory.
    // delete[] graph;

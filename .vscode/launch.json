@@ -1,16 +1,13 @@
-/* launch.json */
 {
     "version": "2.0.0",
     "configurations": [
         
         {
-            "name": "C++ Launch",
+            "name": "(lldb) Debug",
             "type": "cppdbg",
             "request": "launch",
-            /*"program": "${workspaceRoot}/${fileBasenameNoExtension}.exe",*/
-            "program": "${workspaceRoot}/${fileBasenameNoExtension}",
-            /*"preLaunchTask": "build",*/
-            "preLaunchTask": "g++ build active file",
+            "program": "${workspaceFolder}/${relativeFileDirname}/${fileBasenameNoExtension}",
+            "preLaunchTask": "g++ build active file with debug info",
             "internalConsoleOptions": "openOnSessionStart",
             "logging": {
                 "moduleLoad": false,
@@ -21,12 +18,19 @@
             "showDisplayString": false,
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceRoot}",
+            "cwd": "${workspaceFolder}/${relativeFileDirname}",
             "environment": [],
-            "externalConsole": true, // set true to enable keyboard input
+            "externalConsole": true,
             "osx": {
                 "MIMode": "lldb"
-            }
+            },
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
         }
     ]
 }

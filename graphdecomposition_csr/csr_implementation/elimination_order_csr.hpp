@@ -145,7 +145,7 @@ void findChordalEdgesWithEliminationOrder(int *graph, int numVertices, int *elim
     int *bags = new int[numVertices * (numVertices + 1)]; // Assuming a maximum of numVertices bags
 
     // Call the function to create bags and link them
-   //createBags(eliminationOrder, graph, bags, numVertices);
+    createBags(eliminationOrder, graph, bags, numVertices);
 
     // Clean up dynamic memory
     delete[] bags;
