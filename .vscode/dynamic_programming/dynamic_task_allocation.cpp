@@ -1,56 +1,86 @@
 #include <iostream>
+#include <vector>
+#include <algorithm>
 #include <climits>
 
 using namespace std;
 
-// Function to find the minimum lateness using dynamic programming
-int findMinLateness(const int t[], const int D[], int n) {
-    // Calculate maximum possible time
-    int max_time = 0;
-    for (int i = 0; i < n; ++i) {
-        max_time += t[i];
-    }
+// Function to calculate maximum lateness considering dependencies
+int calculateMaxLateness(const vector<int>& completionTimes, const vector<int>& deadlines, const vector<vector<int>>& dependencies) {
+    int n = completionTimes.size();
 
-    // Initialize DP table with infinity (or a very large number)
-    int dp[n + 1][max_time + 1];
-    for (int j = 0; j <= max_time; ++j) {
-        dp[0][j] = 0; // Base case: No tasks result in zero lateness
-    }
-    for (int i = 1; i <= n; ++i) {
-        for (int j = 0; j <= max_time; ++j) {
-            dp[i][j] = INT_MAX;
+    // Initialize DP and inDegree vectors
+    vector<int> dp(n, 0);
+    vector<int> inDegree(n, 0);
+
+    // Build the graph and compute in-degrees
+    vector<vector<int>> graph(n);
+    for (int u = 0; u < n; ++u) {
+        for (int v : dependencies[u]) {
+            graph[v].push_back(u);
+            inDegree[u]++;
         }
     }
-    
-    // Fill the DP table
-    for (int i = 1; i <= n; ++i) {
-        for (int j = 0; j <= max_time; ++j) {
-            if (j >= t[i - 1]) {
-                int lateness_if_scheduled = max(0, j - D[i - 1]);
-                dp[i][j] = min(dp[i - 1][j], dp[i - 1][j - t[i - 1]] + lateness_if_scheduled);
-            } else {
-                dp[i][j] = dp[i - 1][j];
+
+    // Perform topological sort
+    vector<int> topoOrder;
+    vector<int> queue;
+    for (int i = 0; i < n; ++i) {
+        if (inDegree[i] == 0) {
+            queue.push_back(i);
+        }
+    }
+
+    while (!queue.empty()) {
+        int u = queue.back();
+        queue.pop_back();
+        topoOrder.push_back(u);
+
+        for (int v : graph[u]) {
+            inDegree[v]--;
+            if (inDegree[v] == 0) {
+                queue.push_back(v);
             }
         }
     }
-    
-    // The optimal solution is the minimum value in the last row of dp table
-    int result = INT_MAX;
-    for (int j = 0; j <= max_time; ++j) {
-        result = min(result, dp[n][j]);
+
+    // Initialize dp array
+    for (int i = 0; i < n; ++i) {
+        dp[i] = completionTimes[i];
     }
-    
-    return result;
+
+    // Compute the finish times for each task
+    for (int u : topoOrder) {
+        for (int v : graph[u]) {
+            dp[v] = max(dp[v], dp[u] + completionTimes[v]);
+        }
+    }
+
+    // Calculate maximum lateness
+    int maxLateness = 0;
+    for (int i = 0; i < n; ++i) {
+        int lateness = max(0, dp[i] - deadlines[i]);
+        maxLateness = max(maxLateness, lateness);
+    }
+
+    return maxLateness;
 }
 
 int main() {
     // Example usage
-    const int n = 4;
-    int completion_times[n] = {3, 2, 1, 4};
-    int deadlines[n] = {4, 2, 2, 6};
-    
-    int optimal_lateness = findMinLateness(completion_times, deadlines, n);
-    cout << "The optimal lateness is: " << optimal_lateness << endl;
-    
+    vector<int> completionTimes = {3, 2, 4, 1};  // Completion times of tasks
+    vector<int> deadlines = {4, 5, 6, 3};        // Deadlines of tasks
+
+    // Define dependencies: task[i] depends on tasks in dependencies[i]
+    vector<vector<int>> dependencies = {
+        {},       // Task 0 (No dependencies)
+        {},       // Task 1 (No dependencies)
+        {0, 1},   // Task 2 depends on tasks 0 and 1
+        {2}        // Task 3 depends on task 2
+    };
+
+    int maxLateness = calculateMaxLateness(completionTimes, deadlines, dependencies);
+    cout << "The maximum lateness is: " << maxLateness << endl;
+
     return 0;
 }
